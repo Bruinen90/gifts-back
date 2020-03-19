@@ -28,6 +28,8 @@ module.exports = buildSchema(`
     type AuthData {
         token: String!
         userId: String!
+        username: String
+        email: String
     }
 
     input SignUpInputData {
