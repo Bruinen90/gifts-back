@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const isAuth = require('./middleware/isAuth');
 
 // Graphql
 const graphqlHttp = require('express-graphql');
@@ -23,6 +24,8 @@ app.use((req, res, next) => {
 	}
 	next();
 });
+
+app.use(isAuth);
 
 app.use(
 	'/graphql',

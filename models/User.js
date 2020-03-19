@@ -13,6 +13,12 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true
+  },
+  draws: {
+    type: [Schema.Types.ObjectId]
+  },
+  wishes: {
+    type: [Schema.Types.ObjectId]
   }
 });
 

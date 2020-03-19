@@ -1,11 +1,18 @@
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
+const ENV = require("../env/env");
 
 // Models
 const User = require("../models/User");
 const Draw = require("../models/Draw");
 const Wish = require("../models/Wish");
+
+const throwAuthError = () => {
+  const error = new Error("Not authenticated");
+  error.code = 401;
+  throw error;
+};
 
 module.exports = {
   createUser: async ({ userInput }, req) => {
@@ -75,15 +82,21 @@ module.exports = {
         email: user.email,
         username: user.username
       },
-      "secrretttkey@#$"
+      ENV.jwtSecret
     );
     return { token: token, userId: user._id.toString() };
   },
 
   createDraw: async ({ drawInput }, req) => {
+    if (!req.isAuth) {
+      throwAuthError();
+    }
     try {
-      const draw = new Draw(drawInput);
+      const draw = new Draw({ ...drawInput, creatorsID: req.userId });
       const savedDraw = await draw.save();
+      const drawAuthor = await User.findById(req.userId);
+      drawAuthor.draws.push(savedDraw._id);
+      await drawAuthor.save();
       return savedDraw;
     } catch (error) {
       console.log(error);
@@ -91,9 +104,18 @@ module.exports = {
   },
 
   createWish: async ({ wishInput }, req) => {
+    if (!req.isAuth) {
+      throwAuthError();
+    }
     try {
-      const wish = new Wish(wishInput);
+      const wish = new Wish({ ...wishInput, userID: req.userId });
       const savedWish = await wish.save();
+      const wishAuthor = await User.findById(req.userId);
+      if (!wishAuthor) {
+        throwAuthError();
+      }
+      wishAuthor.wishes.push(savedWish._id);
+      await wishAuthor.save();
       return savedWish;
     } catch (error) {
       console.log(error);
