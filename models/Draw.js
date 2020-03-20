@@ -11,13 +11,11 @@ const DrawSchema = new Schema({
     required: true
   },
   date: {
-    // type: Date,
-    type: String,
+    type: Date,
     required: true
   },
   creatorsID: {
-    // type: Schema.Types.ObjectId,
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true
   },
   participantsIDs: {
