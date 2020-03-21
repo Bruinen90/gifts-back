@@ -1,4 +1,4 @@
-const { buildSchema } = require("graphql");
+const { buildSchema } = require('graphql');
 
 module.exports = buildSchema(`
     type Draw {
@@ -7,7 +7,7 @@ module.exports = buildSchema(`
         date: String!
         price: String!
         creator: User!
-        participants: [User!]!
+        participants: [User]
     }
 
     type User {
@@ -30,6 +30,14 @@ module.exports = buildSchema(`
         userId: String!
         username: String
         email: String
+    }
+
+    type DrawsList {
+        drawsList: [Draw]!
+    }
+
+    type DeleteResult {
+        success: Boolean
     }
 
     input SignUpInputData {
@@ -61,10 +69,12 @@ module.exports = buildSchema(`
         createUser(userInput: SignUpInputData): User!
         createDraw(drawInput: DrawInput): Draw!
         createWish(wishInput: WishInput): Wish!
+        deleteDraw(drawId: String): DeleteResult
     }
 
     type RootQuery {
         login(userInput: SignInInputData): AuthData!
+        userDraws: DrawsList!
     }
 
     schema {
