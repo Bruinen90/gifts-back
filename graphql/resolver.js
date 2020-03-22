@@ -157,4 +157,21 @@ module.exports = {
 			console.log(err);
 		}
 	},
+
+	findUser: async ({ searchPhrase }, req) => {
+		if (!req.userId) {
+			throwAuthError();
+		}
+		const regExp = new RegExp(searchPhrase, 'gi');
+		try {
+			const foundByUsername = await User.find(
+				{ $or: [{ username: regExp }, { email: regExp }] },
+				'_id username email'
+			);
+			console.log(foundByUsername);
+			return foundByUsername;
+		} catch (err) {
+			console.log(err);
+		}
+	},
 };

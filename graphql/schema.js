@@ -15,7 +15,7 @@ module.exports = buildSchema(`
         username: String!
         email: String!
         password: String
-        draws: [Draw!]!
+        draws: [Draw]
     }
 
     type Wish {
@@ -75,6 +75,7 @@ module.exports = buildSchema(`
     type RootQuery {
         login(userInput: SignInInputData): AuthData!
         userDraws: DrawsList!
+        findUser(searchPhrase: String): [User]
     }
 
     schema {
