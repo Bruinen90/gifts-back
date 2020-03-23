@@ -95,7 +95,6 @@ module.exports = {
 
 	createDraw: async ({ drawInput }, req) => {
 		if (!req.isAuth) {
-			console.log(drawInput);
 			throwAuthError();
 		}
 		try {
@@ -168,7 +167,6 @@ module.exports = {
 				{ $or: [{ username: regExp }, { email: regExp }] },
 				'_id username email'
 			);
-			console.log(foundByUsername);
 			return foundByUsername;
 		} catch (err) {
 			console.log(err);
