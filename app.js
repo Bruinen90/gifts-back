@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const isAuth = require('./middleware/isAuth');
+const drawsSchedule = require('./scripts/RunDraw');
 
 // Graphql
 const graphqlHttp = require('express-graphql');
@@ -35,6 +36,8 @@ app.use(
 		graphiql: true,
 	})
 );
+
+drawsSchedule();
 
 const spinnUp = async () => {
 	try {

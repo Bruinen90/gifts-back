@@ -135,8 +135,28 @@ module.exports = {
 		try {
 			const allUserDraws = await Draw.find({ creatorsID: req.userId })
 				.populate('participants')
+				.populate({
+					path: 'results.getter',
+				})
 				.exec();
-			return { drawsList: allUserDraws };
+			const withDrawResult = allUserDraws.map(draw => {
+				if (draw.state === 'pending') {
+					return draw;
+				}
+				const drawData = draw._doc;
+				const getterFullData = { ...drawData }.results.find(
+					result => result.giver.toString() === req.userId.toString()
+				).getter;
+				return {
+					...drawData,
+					results: {
+						_id: getterFullData._id,
+						username: getterFullData.username,
+						email: getterFullData.email,
+					},
+				};
+			});
+			return { drawsList: withDrawResult };
 		} catch (err) {
 			console.log(err);
 			throwAuthError();

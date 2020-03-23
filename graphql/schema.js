@@ -8,6 +8,8 @@ module.exports = buildSchema(`
         price: String!
         creator: User!
         participants: [User]
+        results: User
+        status: String
     }
 
     type User {
