@@ -6,7 +6,7 @@ module.exports = async () => {
 	allDraw = await Draw.find({});
 	return allDraw.map(draw =>
 		schedule.scheduleJob(draw.date, () =>
-			runDraw(draw.participantsIDs, draw._id)
+			runDraw(draw.participants, draw._id)
 		)
 	);
 };

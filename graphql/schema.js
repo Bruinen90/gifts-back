@@ -57,8 +57,8 @@ module.exports = buildSchema(`
         title: String!
         date: String!
         price: Int!
-        creatorsID: ID!
-        participantsIDs: [ID!]!
+        creator: ID!
+        participants: [ID!]!
     }
 
     input WishInput {
