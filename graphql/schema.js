@@ -67,8 +67,7 @@ module.exports = buildSchema(`
         title: String!
         link: String
         description: String
-        price: Int
-        creator: ID!
+        price: Int!
     }
 
     type RootMutation {
