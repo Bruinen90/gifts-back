@@ -25,6 +25,8 @@ module.exports = buildSchema(`
         title: String!
         link: String
         description: String
+        price: Int
+        creator: ID!
     }
 
     type AuthData {
@@ -65,6 +67,8 @@ module.exports = buildSchema(`
         title: String!
         link: String
         description: String
+        price: Int
+        creator: ID!
     }
 
     type RootMutation {

@@ -118,7 +118,7 @@ module.exports = {
 			throwAuthError();
 		}
 		try {
-			const wish = new Wish({ ...wishInput, userID: req.userId });
+			const wish = new Wish({ ...wishInput, creator: req.userId });
 			const savedWish = await wish.save();
 			const wishAuthor = await User.findById(req.userId);
 			if (!wishAuthor) {
