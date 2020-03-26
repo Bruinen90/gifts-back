@@ -81,6 +81,7 @@ module.exports = buildSchema(`
         login(userInput: SignInInputData): AuthData!
         userDraws: DrawsList!
         findUser(searchPhrase: String): [User]
+        userWishes(userId: ID): [Wish]
     }
 
     schema {
