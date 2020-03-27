@@ -76,6 +76,7 @@ module.exports = buildSchema(`
         createWish(wishInput: WishInput): Wish!
         deleteDraw(drawId: String): DeleteResult
         deleteWish(wishId: String): DeleteResult
+        exitDraw(drawId: ID!): DeleteResult
     }
 
     type RootQuery {
