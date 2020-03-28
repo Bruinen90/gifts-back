@@ -61,6 +61,7 @@ module.exports = buildSchema(`
         price: Int!
         creator: ID!
         participants: [ID!]!
+        _id: ID
     }
 
     input WishInput {
@@ -68,6 +69,7 @@ module.exports = buildSchema(`
         link: String
         description: String
         price: Int!
+        _id: ID
     }
 
     type RootMutation {
