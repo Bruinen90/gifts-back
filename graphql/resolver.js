@@ -277,4 +277,50 @@ module.exports = {
 			return { success: false };
 		}
 	},
+
+	setReserved: async ({ reservation }, req) => {
+		const { userId } = req;
+		const { wishId, drawId, reserved } = reservation;
+		if (!userId) {
+			throwAuthError(
+				'You need to be logged in to set "I will buy it status"'
+			);
+		}
+		try {
+			const desiredWish = await Wish.findById(wishId);
+
+			if (reserved) {
+				if (desiredWish.reserved) {
+					throwAuthError(
+						"You can't reserve this wish, someone else has done it before you"
+					);
+				}
+				desiredWish.reserved = true;
+				desiredWish.buyer = userId;
+				// Hacky, might be a better way!
+				const desiredDraw = await Draw.findById(drawId);
+				let index;
+				const resultToModify = desiredDraw.results.find((result, i) => {
+					index = i;
+					return result.giver.toString() === userId.toString();
+				});
+				desiredDraw.results[index].gift = wishId;
+				await desiredDraw.save();
+			} else {
+				if (desiredWish.buyer !== userId) {
+					throwAuthError(
+						"You can't cancel reservation of another user"
+					);
+				}
+				desiredWish.reserved = false;
+				desiredWish.buyer = undefined;
+				// Modify draw results!
+			}
+			await desiredWish.save();
+			return { success: true };
+		} catch (err) {
+			console.log(err);
+			return { success: false };
+		}
+	},
 };

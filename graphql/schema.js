@@ -40,7 +40,7 @@ module.exports = buildSchema(`
         drawsList: [Draw]!
     }
 
-    type DeleteResult {
+    type SuccessResult {
         success: Boolean
     }
 
@@ -72,13 +72,20 @@ module.exports = buildSchema(`
         _id: ID
     }
 
+    input Reservation {
+        wishId: ID!
+        drawId: ID!
+        reserved: Boolean!
+    }
+
     type RootMutation {
         createUser(userInput: SignUpInputData): User!
         createDraw(drawInput: DrawInput): Draw!
         createWish(wishInput: WishInput): Wish!
-        deleteDraw(drawId: String): DeleteResult
-        deleteWish(wishId: String): DeleteResult
-        exitDraw(drawId: ID!): DeleteResult
+        deleteDraw(drawId: String): SuccessResult
+        deleteWish(wishId: String): SuccessResult
+        exitDraw(drawId: ID!): SuccessResult
+        setReserved(reservation: Reservation!): SuccessResult
     }
 
     type RootQuery {
