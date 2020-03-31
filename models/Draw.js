@@ -27,7 +27,7 @@ const DrawSchema = new Schema({
 		{
 			giver: { type: Schema.Types.ObjectId, ref: 'User' },
 			getter: { type: Schema.Types.ObjectId, ref: 'User' },
-			gift: { type: Schema.Types.ObjectId, ref: 'Wish' },
+			gifts: [{ type: Schema.Types.ObjectId, ref: 'Wish' }],
 		},
 	],
 });

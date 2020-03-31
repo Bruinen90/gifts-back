@@ -5,7 +5,7 @@ module.exports = buildSchema(`
         _id: ID
         username: String!
         email: String
-        gift: Wish
+        gifts: [Wish]
     }
 
     type Draw {
