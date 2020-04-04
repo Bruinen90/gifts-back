@@ -1,7 +1,7 @@
 const Draw = require('../models/Draw');
 const schedule = require('node-schedule');
 
-module.exports = async () => {
+module.exports.scheduleDraws = async () => {
 	// Add draw status and remove already done draws!
 	allDraw = await Draw.find({});
 	return allDraw.map(draw =>
@@ -37,8 +37,17 @@ const runDraw = async (participantsIds, drawId) => {
 		const doneDraw = await Draw.findById(drawId);
 		doneDraw.results = boardWithPairs;
 		doneDraw.status = 'done';
-		await doneDraw.save();
+		const savedDraw = await doneDraw.save();
+		const populateOpts = [
+			{ path: 'participants' },
+			{ path: 'creator' },
+			{ path: 'results.getter' },
+			{ path: 'results.gifts' },
+		];
+		return await Draw.populate(savedDraw, populateOpts);
 	} catch (err) {
 		console.log(err);
 	}
 };
+
+module.exports.execute = runDraw;

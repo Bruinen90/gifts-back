@@ -13,13 +13,13 @@ const UserSchema = new Schema({
 	password: {
 		type: String,
 		required: true,
-	},
-	draws: {
-		type: [{ type: Schema.Types.ObjectId, ref: 'Draw' }],
-	},
-	wishes: {
-		type: [{ type: Schema.Types.ObjectId, ref: 'Wish' }],
-	},
+	}
+	// draws: {
+	// 	type: [{ type: Schema.Types.ObjectId, ref: 'Draw' }],
+	// },
+	// wishes: {
+	// 	type: [{ type: Schema.Types.ObjectId, ref: 'Wish' }],
+	// },
 });
 
 module.exports = mongoose.model('User', UserSchema);

@@ -95,6 +95,7 @@ module.exports = buildSchema(`
         deleteWish(wishId: String): SuccessResult
         exitDraw(drawId: ID!): SuccessResult
         setReserved(reservation: Reservation!): SuccessResult
+        runDraw(drawId: ID!): DrawResults
     }
 
     type RootQuery {

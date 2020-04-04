@@ -37,7 +37,7 @@ app.use(
   })
 );
 console.log(new Date());
-drawsSchedule();
+drawsSchedule.scheduleDraws();
 
 const spinnUp = async () => {
   try {
