@@ -96,6 +96,7 @@ module.exports = buildSchema(`
         exitDraw(drawId: ID!): SuccessResult
         setReserved(reservation: Reservation!): SuccessResult
         runDraw(drawId: ID!): DrawResults
+        archiveDraw(drawId: ID!): SuccessResult
     }
 
     type RootQuery {

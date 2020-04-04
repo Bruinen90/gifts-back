@@ -351,4 +351,24 @@ module.exports = {
 		);
 		return creatorResults.getter;
 	},
+
+	archiveDraw: async ({ drawId }, req) => {
+		if (!req.userId) {
+			throwAuthError('Please login and try again');
+		}
+		try {
+			const draw = await Draw.findById(drawId);
+			if (draw.creator.toString() !== req.userId.toString()) {
+				throwAuthError(
+					'You are not authenticated to change status of draws created by other user'
+				);
+			}
+			draw.status = 'archived';
+			await draw.save();
+			return { success: true };
+		} catch (err) {
+			console.log(err);
+			return { success: false };
+		}
+	},
 };
