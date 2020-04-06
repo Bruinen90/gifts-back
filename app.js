@@ -7,7 +7,7 @@ const drawsSchedule = require("./scripts/RunDraw");
 // Graphql
 const graphqlHttp = require("express-graphql");
 const graphqlSchema = require("./graphql/schema");
-const graphqlResolver = require("./graphql/resolver");
+const graphqlResolver = require("./graphql/root_resolver");
 
 const app = express();
 
