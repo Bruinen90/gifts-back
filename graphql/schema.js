@@ -53,6 +53,10 @@ module.exports = buildSchema(`
         success: Boolean
     }
 
+    type CreatedId {
+        _id: ID!
+    }
+
     input SignUpInputData {
         username: String!
         email: String!
@@ -97,6 +101,7 @@ module.exports = buildSchema(`
         setReserved(reservation: Reservation!): SuccessResult
         runDraw(drawId: ID!): DrawResults
         archiveDraw(drawId: ID!): SuccessResult
+        sendInvitation(receiverId: ID!): CreatedId
     }
 
     type RootQuery {
