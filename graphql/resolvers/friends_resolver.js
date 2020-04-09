@@ -1,72 +1,100 @@
 // Models
 const Invitation = require("../../models/Invitation");
+const User = require("../../models/User");
 
 // Errors
 const throwAuthError = (errorMessage) => {
-    const error = new Error(errorMessage || "Not authenticated");
-    error.code = 401;
-    throw error;
+  const error = new Error(errorMessage || "Not authenticated");
+  error.code = 401;
+  throw error;
 };
 
 const throwServerError = (errorMessage) => {
-    const error = new Error(
-        errorMessage || "Internal server error, please try again later"
-    );
-    error.code = 500;
-    throw error;
+  const error = new Error(
+    errorMessage || "Internal server error, please try again later"
+  );
+  error.code = 500;
+  throw error;
 };
 
 module.exports = {
-    sendInvitation: async ({ receiverId }, req) => {
-        if (!req.userId) {
-            throwAuthError();
-        }
-        const newInvitation = await new Invitation({
-            sender: req.userId,
-            receiver: receiverId,
-        });
-        await newInvitation.save();
-        if (!newInvitation) {
-            throwServerError(
-                "Error during invitation creation, please try again later"
-            );
-        }
-        return { _id: newInvitation._id };
-    },
+  sendInvitation: async ({ receiverId }, req) => {
+    if (!req.userId) {
+      throwAuthError();
+    }
+    const existingInvitation = await Invitation.findOne({
+      sender: req.userId,
+      receiver: receiverId,
+    });
+    if (existingInvitation) {
+      const error = new Error(
+        "You already invited that user, please be patient and wait for response"
+      );
+      error.code = 401;
+      throw error;
+    }
+    const newInvitation = await new Invitation({
+      sender: req.userId,
+      receiver: receiverId,
+    });
+    await newInvitation.save();
+    if (!newInvitation) {
+      throwServerError(
+        "Error during invitation creation, please try again later"
+      );
+    }
+    return { _id: newInvitation._id };
+  },
 
-    getUserInvitations: async (_, req) => {
-        if (!req.userId) {
-            throwAuthError("Please loggin and try again");
-        }
-        const receivedInvitations = await Invitation.find({
-            receiver: req.userId,
-        })
-            .populate("sender")
-            .exec();
-        const sentInvitations = await Invitation.find({ sender: req.userId })
-            .populate("receiver")
-            .exec();
-        console.log(sentInvitations);
+  getUserInvitations: async (_, req) => {
+    if (!req.userId) {
+      throwAuthError("Please loggin and try again");
+    }
+    const receivedInvitations = await Invitation.find({
+      receiver: req.userId,
+    })
+      .populate("sender")
+      .exec();
+    const sentInvitations = await Invitation.find({ sender: req.userId })
+      .populate("receiver")
+      .exec();
+    console.log(receivedInvitations);
+    return { received: receivedInvitations, sent: sentInvitations };
+  },
 
-        // if (!userInvitations || userInvitations.length === 0) {
-        //     return null;
-        // }
-        return { received: receivedInvitations, sent: sentInvitations };
-    },
-
-    setInvitationResponse: async ({ invitationId, response }, req) => {
-        if (!req.userId) {
-            throwAuthError("Please loggin and try again");
-        }
-        const respondedInvitation = await Invitation.deleteOne({
-            _id: invitationId,
-            sender: req.userId,
-        });
-        if (!respondedInvitation) {
-            throwAuthError(
-                "There was a problem with your invitation, please try again later"
-            );
-        }
-        return { success: true };
-    },
+  setInvitationResponse: async ({ invitationId, response }, req) => {
+    if (!req.userId) {
+      throwAuthError("Please loggin and try again");
+    }
+    if (response === "cancel") {
+      const respondedInvitation = await Invitation.deleteOne({
+        _id: invitationId,
+        sender: req.userId,
+      });
+      if (!respondedInvitation) {
+        throwAuthError(
+          "There was a problem with your invitation, please try again later"
+        );
+      }
+    } else if (response === "reject") {
+      const respondedInvitation = await Invitation.deleteOne({
+        _id: invitationId,
+        receiver: req.userId,
+      });
+      if (!respondedInvitation) {
+        throwAuthError(
+          "There was a problem with your invitation, please try again later"
+        );
+      }
+    } else if (response === "accept") {
+      const respondedInvitation = await Invitation.findById(invitationId);
+      const sender = await User.findById(respondedInvitation.sender);
+      const receiver = await User.findById(respondedInvitation.receiver);
+      sender.friends.push(respondedInvitation.receiver);
+      sender.save();
+      receiver.friends.push(respondedInvitation.sender);
+      receiver.save();
+    }
+    return { success: true };
+  },
 };
