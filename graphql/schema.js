@@ -104,7 +104,7 @@ module.exports = buildSchema(`
 
     input InvitationResponse {
         invitationId: ID! 
-        response: String!
+        decision: String!
     }
 
     type RootMutation {
