@@ -38,6 +38,17 @@ module.exports = buildSchema(`
         reserved: Boolean
     }
 
+    type Invitation {
+        _id: ID!
+        sender: User!
+        receiver: User!
+    }
+
+    type UserInvitations {
+        received: [Invitation]
+        sent: [Invitation]
+    }
+
     type AuthData {
         token: String!
         userId: String!
@@ -91,6 +102,11 @@ module.exports = buildSchema(`
         reserved: Boolean!
     }
 
+    input InvitationResponse {
+        invitationId: ID! 
+        response: String!
+    }
+
     type RootMutation {
         createUser(userInput: SignUpInputData): User!
         createDraw(drawInput: DrawInput): Draw!
@@ -102,6 +118,8 @@ module.exports = buildSchema(`
         runDraw(drawId: ID!): DrawResults
         archiveDraw(drawId: ID!): SuccessResult
         sendInvitation(receiverId: ID!): CreatedId
+        getUserInvitations: UserInvitations
+        setInvitationResponse(response: InvitationResponse!): SuccessResult
     }
 
     type RootQuery {
