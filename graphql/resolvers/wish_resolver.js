@@ -1,20 +1,20 @@
 // Models
-const Draw = require("../../models/Draw");
-const Wish = require("../../models/Wish");
+const Draw = require('../../models/Draw');
+const Wish = require('../../models/Wish');
 
 // Errors
 const throwAuthError = errorMessage => {
-    const error = new Error(errorMessage || "Not authenticated");
-    error.code = 401;
-    throw error;
+	const error = new Error(errorMessage || 'Not authenticated');
+	error.code = 401;
+	throw error;
 };
 
 const throwServerError = errorMessage => {
-    const error = new Error(
-        errorMessage || "Internal server error, please try again later"
-    );
-    error.code = 500;
-    throw error;
+	const error = new Error(
+		errorMessage || 'Internal server error, please try again later'
+	);
+	error.code = 500;
+	throw error;
 };
 
 module.exports = {
@@ -86,14 +86,6 @@ module.exports = {
 		}
 		try {
 			const desiredWish = await Wish.findById(wishId);
-			// Hacky, might be a better way!
-			const desiredDraw = await Draw.findById(drawId);
-			let index;
-			desiredDraw.results.find((result, i) => {
-				index = i;
-				return result.giver.toString() === userId.toString();
-			});
-
 			if (reserved) {
 				if (desiredWish.reserved) {
 					throwAuthError(
@@ -102,7 +94,6 @@ module.exports = {
 				}
 				desiredWish.reserved = true;
 				desiredWish.buyer = userId;
-				desiredDraw.results[index].gifts.push(wishId);
 			} else {
 				if (desiredWish.buyer.toString() !== userId.toString()) {
 					throwAuthError(
@@ -111,19 +102,34 @@ module.exports = {
 				}
 				desiredWish.reserved = false;
 				desiredWish.buyer = undefined;
-				desiredDraw.results[index].gifts = desiredDraw.results[
-					index
-				].gifts.filter(
-					giftId => giftId.toString() !== wishId.toString()
-				);
+			}
+
+			// If reservation refers to specific draw, not just friend from friend list
+			if (drawId) {
+				// Hacky, might be a better way!
+				const desiredDraw = await Draw.findById(drawId);
+				let index;
+				desiredDraw.results.find((result, i) => {
+					index = i;
+					return result.giver.toString() === userId.toString();
+				});
+
+				if (reserved) {
+					desiredDraw.results[index].gifts.push(wishId);
+				} else {
+					desiredDraw.results[index].gifts = desiredDraw.results[
+						index
+					].gifts.filter(
+						giftId => giftId.toString() !== wishId.toString()
+					);
+				}
+				await desiredDraw.save();
 			}
 			await desiredWish.save();
-			await desiredDraw.save();
 			return { success: true };
 		} catch (err) {
 			console.log(err);
 			return { success: false };
 		}
 	},
-
-}
+};

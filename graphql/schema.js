@@ -120,6 +120,7 @@ module.exports = buildSchema(`
         sendInvitation(receiverId: ID!): CreatedId
         getUserInvitations: UserInvitations
         setInvitationResponse(response: InvitationResponse!): SuccessResult
+        cancelFriendship(friendId: String): SuccessResult
     }
 
     type RootQuery {
@@ -127,6 +128,7 @@ module.exports = buildSchema(`
         userDraws: DrawsList!
         findUser(searchPhrase: String): [User]
         userWishes(userId: ID): [Wish]
+        getUserFriends: [User]
     }
 
     schema {
