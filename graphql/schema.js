@@ -98,7 +98,7 @@ module.exports = buildSchema(`
 
     input Reservation {
         wishId: ID!
-        drawId: ID!
+        drawId: ID
         reserved: Boolean!
     }
 
