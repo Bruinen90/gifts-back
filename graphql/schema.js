@@ -13,7 +13,7 @@ module.exports = buildSchema(`
         title: String!
         date: String!
         price: String!
-        creator: User!
+        creator: User
         participants: [User]
         results: DrawResults
         status: String
@@ -36,6 +36,16 @@ module.exports = buildSchema(`
         creator: ID!
         buyer: ID
         reserved: Boolean
+    }
+
+    type WishPopulated {
+        _id: ID!
+        title: String!
+        link: String
+        description: String
+        price: Int
+        creator: User!
+        forDraw: ID
     }
 
     type Invitation {
@@ -129,6 +139,7 @@ module.exports = buildSchema(`
         findUser(searchPhrase: String): [User]
         userWishes(userId: ID): [Wish]
         getUserFriends: [User]
+        getShoppingList: [WishPopulated]
     }
 
     schema {

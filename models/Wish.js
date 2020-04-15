@@ -8,6 +8,7 @@ const WishSchema = new Schema({
 	price: Number,
 	creator: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 	buyer: { type: Schema.Types.ObjectId, ref: 'User' },
+	forDraw: { type: Schema.Types.ObjectId, ref: 'Draw'},
 	reserved: { type: Boolean, default: false },
 });
 
