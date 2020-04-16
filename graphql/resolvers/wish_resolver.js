@@ -1,3 +1,5 @@
+const rp = require("request-promise");
+
 // Models
 const Draw = require("../../models/Draw");
 const Wish = require("../../models/Wish");
@@ -21,6 +23,17 @@ module.exports = {
     createWish: async ({ wishInput }, req) => {
         if (!req.isAuth) {
             throwAuthError();
+        }
+        if (wishInput.link) {
+            try {
+                const html = await rp(wishInput.link);
+                const foundImgUrl = html.match(
+                    /<meta itemprop="image" content=["'](.*?)["']/gim
+                );
+                console.log(foundImgUrl);
+            } catch (error) {
+                console.log(error);
+            }
         }
         if (wishInput._id) {
             try {
@@ -109,27 +122,6 @@ module.exports = {
                     desiredWish.forDraw = undefined;
                 }
             }
-
-            // If reservation refers to specific draw, not just friend from friend list
-            // if (drawId) {
-                // Hacky, might be a better way!
-                // const desiredDraw = await Draw.findById(drawId);
-                // let index;
-                // desiredDraw.results.find((result, i) => {
-                //     index = i;
-                //     return result.giver.toString() === userId.toString();
-                // });
-                // if (reserved) {
-                //     desiredDraw.results[index].gifts.push(wishId);
-                // } else {
-                //     desiredDraw.results[index].gifts = desiredDraw.results[
-                //         index
-                //     ].gifts.filter(
-                //         (giftId) => giftId.toString() !== wishId.toString()
-                //     );
-                // }
-                // await desiredDraw.save();
-            // }
             await desiredWish.save();
             return { success: true };
         } catch (err) {
