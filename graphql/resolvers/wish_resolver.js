@@ -24,36 +24,41 @@ module.exports = {
         if (!req.isAuth) {
             throwAuthError();
         }
-        if (wishInput.link) {
-            try {
+        try {
+            let imageUrl;
+            if (wishInput.link) {
                 const html = await rp(wishInput.link);
-                const foundImgUrl = html.match(
-                    /<meta itemprop="image" content=["'](.*?)["']/gim
-                );
-                console.log(foundImgUrl);
-            } catch (error) {
-                console.log(error);
+                const matchesArr = [
+                    ...html.matchAll(
+                        /(?:<meta (?:itemprop="(?:image|og:image)"|property="(?:image|og:image)") content=["'])(.*?)["']/gim
+                    ),
+                ];
+                let foundImg;
+                if (matchesArr[0]) {
+                    foundImg = matchesArr[0][1];
+                }
+                if (foundImg) {
+                    imageUrl = foundImg;
+                }
             }
-        }
-        if (wishInput._id) {
-            try {
+            let newWishData = wishInput;
+            if (imageUrl) {
+                newWishData.imageUrl = imageUrl;
+            }
+            if (wishInput._id) {
                 const updatedWish = await Wish.findByIdAndUpdate(
                     wishInput._id,
-                    wishInput,
+                    newWishData,
                     { useFindAndModify: false }
                 );
-                return updatedWish;
-            } catch (err) {
-                console.log(err);
-            }
-        } else {
-            try {
-                const wish = new Wish({ ...wishInput, creator: req.userId });
+                return newWishData;
+            } else {
+                const wish = new Wish({ ...newWishData, creator: req.userId });
                 const savedWish = await wish.save();
                 return savedWish;
-            } catch (error) {
-                console.log(error);
             }
+        } catch (error) {
+            console.log(error);
         }
     },
 
