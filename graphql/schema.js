@@ -43,6 +43,7 @@ module.exports = buildSchema(`
         _id: ID!
         title: String!
         link: String
+        imageUrl: String
         description: String
         price: Int
         creator: User!
