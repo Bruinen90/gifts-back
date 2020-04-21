@@ -25,23 +25,31 @@ module.exports = {
 			throwAuthError();
 		}
 		try {
-			let imageUrl;
-			if (wishInput.link) {
-				const html = await rp(wishInput.link);
-				const matchesArr = [
-					...html.matchAll(
-						/(?:<meta (?:itemprop="(?:image|og:image)"|property="(?:image|og:image)") content=["'])(.*?)["']/gim
-					),
-				];
-				let foundImg;
-				if (matchesArr && matchesArr[0] && matchesArr[0].length > 0) {
-					foundImg = matchesArr[0][1];
-				}
-				if (foundImg) {
-					imageUrl = foundImg;
-				}
-			}
 			let newWishData = wishInput;
+			let imageUrl;
+			try {
+				if (wishInput.link && wishInput.link.startsWith('http')) {
+					const html = await rp(wishInput.link);
+					const matchesArr = [
+						...html.matchAll(
+							/(?:<meta (?:itemprop="(?:image|og:image)"|property="(?:image|og:image)") content=["'])(.*?)["']/gim
+						),
+					];
+					let foundImg;
+					if (
+						matchesArr &&
+						matchesArr[0] &&
+						matchesArr[0].length > 0
+					) {
+						foundImg = matchesArr[0][1];
+					}
+					if (foundImg) {
+						imageUrl = foundImg;
+					}
+				}
+			} catch (err) {
+				console.log(err);
+			}
 			if (imageUrl) {
 				newWishData.imageUrl = imageUrl;
 			}
