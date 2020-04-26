@@ -36,7 +36,6 @@ app.use(
     graphiql: true
   })
 );
-console.log(new Date());
 drawsSchedule.scheduleDraws();
 
 const spinnUp = async () => {
