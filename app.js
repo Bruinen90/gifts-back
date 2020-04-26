@@ -41,7 +41,7 @@ drawsSchedule.scheduleDraws();
 const spinnUp = async () => {
 	try {
 		await mongoose.connect(
-			'mongodb+srv://bruinen:hRxPMYjRFhTOapq2@nodecourse-wx0jk.gcp.mongodb.net/gifts',
+			`mongodb+srv://bruinen:${process.env.MONGO_PASSWORD}@nodecourse-wx0jk.gcp.mongodb.net/gifts`,
 			{
 				useNewUrlParser: true,
 				useUnifiedTopology: true,

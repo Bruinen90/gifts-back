@@ -1,1 +1,1 @@
-exports.jwtSecret = 'mysupersecretsecret';
+exports.jwtSecret = process.env.JWT_SECRET;
