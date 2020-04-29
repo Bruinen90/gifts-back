@@ -1,4 +1,4 @@
-const { buildSchema } = require('graphql');
+const { buildSchema } = require("graphql");
 
 module.exports = buildSchema(`
     type DrawResults {
@@ -133,6 +133,7 @@ module.exports = buildSchema(`
         getUserInvitations: UserInvitations
         setInvitationResponse(response: InvitationResponse!): SuccessResult
         cancelFriendship(friendId: String): SuccessResult
+        sendResetPasswordEmail(email: String!): SuccessResult
     }
 
     type RootQuery {

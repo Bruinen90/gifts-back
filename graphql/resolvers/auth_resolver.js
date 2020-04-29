@@ -7,13 +7,13 @@ const ENV = require("../../env/env");
 const User = require("../../models/User");
 
 // Errors
-const throwAuthError = errorMessage => {
+const throwAuthError = (errorMessage) => {
     const error = new Error(errorMessage || "Not authenticated");
     error.code = 401;
     throw error;
 };
 
-const throwServerError = errorMessage => {
+const throwServerError = (errorMessage) => {
     const error = new Error(
         errorMessage || "Internal server error, please try again later"
     );
@@ -32,22 +32,22 @@ module.exports = {
             !validator.isLength(userInput.password, { min: 5 })
         ) {
             errors.push({
-                message: "Password should be at least 5 characters long"
+                message: "Password should be at least 5 characters long",
             });
         }
         if (!validator.isLength(userInput.username, { min: 3, max: 30 })) {
             errors.push({
                 message:
-                    "Username should be at least 3 and maximum 30 characters long"
+                    "Username should be at least 3 and maximum 30 characters long",
             });
         }
         if (errors.length > 0) {
-            const errorsList = errors.map(error => error.message).join(". ");
+            const errorsList = errors.map((error) => error.message).join(". ");
             const error = new Error("Invalid input. " + errorsList);
             throw error;
         }
         const existingUsername = await User.findOne({
-            username: userInput.username
+            username: userInput.username,
         });
         if (existingUsername) {
             const error = new Error("Login taken");
@@ -62,7 +62,7 @@ module.exports = {
         const user = new User({
             username: userInput.username,
             email: userInput.email,
-            password: hashedPassword
+            password: hashedPassword,
         });
         const createdUser = await user.save();
         return { ...createdUser._doc, _id: createdUser._id.toString() };
@@ -88,7 +88,7 @@ module.exports = {
             {
                 userId: user._id.toString(),
                 email: user.email,
-                username: user.username
+                username: user.username,
             },
             ENV.jwtSecret
         );
@@ -96,23 +96,36 @@ module.exports = {
             token: token,
             userId: user._id.toString(),
             username: user.username,
-            email: user.email
+            email: user.email,
         };
-	},
-	
-	findUser: async ({ searchPhrase }, req) => {
-		if (!req.userId) {
-			throwAuthError();
-		}
-		const regExp = new RegExp(searchPhrase, 'gi');
-		try {
-			const foundByUsername = await User.find(
-				{ $or: [{ username: regExp }, { email: regExp }] },
-				'_id username email'
-			);
-			return foundByUsername;
-		} catch (err) {
-			console.log(err);
-		}
-	},
+    },
+
+    findUser: async ({ searchPhrase }, req) => {
+        if (!req.userId) {
+            throwAuthError();
+        }
+        const regExp = new RegExp(searchPhrase, "gi");
+        try {
+            const foundByUsername = await User.find(
+                { $or: [{ username: regExp }, { email: regExp }] },
+                "_id username email"
+            );
+            return foundByUsername;
+        } catch (err) {
+            console.log(err);
+        }
+    },
+
+    sendResetPasswordEmail: async ({ email }, req) => {
+        const userToReset = await User.findOne({ email: email });
+        if (!userToReset) {
+            return { success: false };
+        }
+        // SEND EMAIL LOGIC GOES HERE
+        const { SENDGRID_API_KEY } = process.env;
+        // EMAIL SENT
+        // SAVE RESET TOKEN IN DB
+        // TOKEN SAVED
+        return { success: true };
+    },
 };
