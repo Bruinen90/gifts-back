@@ -15,7 +15,7 @@ const UserSchema = new Schema({
         required: true,
     },
     passwordResetToken: String,
-    passwordResetTokenExpData: Date,
+    passwordResetTokenExpDate: Date,
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
