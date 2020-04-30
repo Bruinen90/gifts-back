@@ -4,6 +4,10 @@ const jwt = require("jsonwebtoken");
 const ENV = require("../../env/env");
 const crypto = require("crypto");
 
+// Send grid config
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 // Models
 const User = require("../../models/User");
 
@@ -118,22 +122,41 @@ module.exports = {
     },
 
     sendResetPasswordEmail: async ({ email }, req) => {
-        const userToReset = await User.findOne({ email: email });
-        if (!userToReset) {
+        try {
+            const userToReset = await User.findOne({ email: email });
+            if (!userToReset) {
+                return { success: false };
+            }
+            const token = crypto.randomBytes(20).toString("hex");
+            const resetLink = `http://${req.headers.host}/utworz-haslo/?${email}#${token}`;
+            console.log(resetLink);
+            // SEND EMAIL LOGIC GOES HERE
+
+            const mailOptions = {
+                to: user.email,
+                from: "reset@bez-niespodzianek.pl",
+                subject: "Reset hasła bez-niespodzianek",
+                text: `Witaj ${userToReset.username}. W serwisie bez niespodzianek zażądano zresetowania Twojego hasła \n 
+            Jeśli nie prosiłeś o reset hasła zignorują tą wiadomość, Twoje hasło pozostanie bez zmian.
+            Aby ustawić nowe hasło kliknij w ten link lub skopiuj go do okna przeglądarki: ${resetLink} \n\n `,
+            };
+
+            await sgMail.send(mailOptions, (error, result) => {
+                if (error) return { success: false };
+            });
+            // EMAIL SENT
+            // SAVE RESET TOKEN IN DB
+            const tokenExpDate = Date.now() + 3600000;
+            userToReset.passwordResetToken = token;
+            userToReset.passwordResetTokenExpDate = tokenExpDate;
+            await userToReset.save();
+            // TOKEN SAVED
+            return { success: true };
+        } catch (error) {
+            console.log(error);
             return { success: false };
         }
-        const token = crypto.randomBytes(20).toString("hex");
-        const resetLink = `http://${req.headers.host}/utworz-haslo/?${email}#${token}`;
-        console.log(resetLink);
-        // SEND EMAIL LOGIC GOES HERE
-        const { SENDGRID_API_KEY } = process.env;
-        // EMAIL SENT
-        // SAVE RESET TOKEN IN DB
-        const tokenExpDate = Date.now() + 3600000;
-        userToReset.passwordResetToken = token;
-        userToReset.passwordResetTokenExpDate = tokenExpDate;
-        await userToReset.save();
-        // TOKEN SAVED
-        return { success: true };
     },
+
+    setNewPassword: async ({ password, email, token }, req) => {},
 };
