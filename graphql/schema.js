@@ -74,6 +74,7 @@ module.exports = buildSchema(`
 
     type SuccessResult {
         success: Boolean
+        message: String
     }
 
     type CreatedId {
@@ -119,6 +120,12 @@ module.exports = buildSchema(`
         decision: String!
     }
 
+    input NewPasswordInput {
+        password: String!
+        email: String!
+        token: String!
+    }
+
     type RootMutation {
         createUser(userInput: SignUpInputData): User!
         createDraw(drawInput: DrawInput): Draw!
@@ -134,6 +141,7 @@ module.exports = buildSchema(`
         setInvitationResponse(response: InvitationResponse!): SuccessResult
         cancelFriendship(friendId: String): SuccessResult
         sendResetPasswordEmail(email: String!): SuccessResult
+        setNewPassword(newPasswordInput: NewPasswordInput!): SuccessResult
     }
 
     type RootQuery {

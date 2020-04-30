@@ -132,9 +132,6 @@ module.exports = {
             }
             const token = crypto.randomBytes(20).toString("hex");
             const resetLink = `${req.headers.origin}/utworz-haslo/?${email}#${token}`;
-            console.log(resetLink);
-            // SEND EMAIL LOGIC GOES HERE
-
             const mailOptions = {
                 to: email,
                 from: "reset@bez-niespodzianek.pl",
@@ -147,13 +144,11 @@ module.exports = {
             await sgMail.send(mailOptions, (error, result) => {
                 if (error) return { success: false };
             });
-            // EMAIL SENT
-            // SAVE RESET TOKEN IN DB
+            // Saving token to DB
             const tokenExpDate = Date.now() + 3600000;
             userToReset.passwordResetToken = token;
             userToReset.passwordResetTokenExpDate = tokenExpDate;
             await userToReset.save();
-            // TOKEN SAVED
             return { success: true };
         } catch (error) {
             console.log(error);
@@ -161,5 +156,33 @@ module.exports = {
         }
     },
 
-    setNewPassword: async ({ password, email, token }, req) => {},
+    setNewPassword: async ({ newPasswordInput }, req) => {
+        const { password, email, token } = newPasswordInput;
+        const userToReset = await User.findOne({ email: email });
+        if (!userToReset) {
+            return {
+                success: false,
+                message: `No user found with provided email address: ${email}`,
+            };
+        }
+        const tokenIsOutdated =
+            Date.now() > userToReset.passwordResetTokenExpDate;
+        if (userToReset.passwordResetToken !== token || tokenIsOutdated) {
+            return {
+                success: false,
+                message: "Provided token is not valid",
+            };
+        }
+        if (password.length < 5) {
+            return {
+                success: false,
+                message:
+                    "Provided password is too short - it should be at least 5 characters",
+            };
+        }
+        const hashedPassword = await bcrypt.hash(password, 12);
+        userToReset.password = hashedPassword;
+        await userToReset.save();
+        return { success: true, message: "New password properly saved" };
+    },
 };
