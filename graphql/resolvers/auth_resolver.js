@@ -6,7 +6,10 @@ const crypto = require("crypto");
 
 // Send grid config
 const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+sgMail.setApiKey(
+    "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"
+);
 
 // Models
 const User = require("../../models/User");
@@ -128,12 +131,12 @@ module.exports = {
                 return { success: false };
             }
             const token = crypto.randomBytes(20).toString("hex");
-            const resetLink = `http://${req.headers.host}/utworz-haslo/?${email}#${token}`;
+            const resetLink = `${req.headers.origin}/utworz-haslo/?${email}#${token}`;
             console.log(resetLink);
             // SEND EMAIL LOGIC GOES HERE
 
             const mailOptions = {
-                to: user.email,
+                to: email,
                 from: "reset@bez-niespodzianek.pl",
                 subject: "Reset hasła bez-niespodzianek",
                 text: `Witaj ${userToReset.username}. W serwisie bez niespodzianek zażądano zresetowania Twojego hasła \n 
