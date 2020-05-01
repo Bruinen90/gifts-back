@@ -9,6 +9,8 @@ const graphqlHttp = require('express-graphql');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/root_resolver');
 
+const ENV = require('./env/env');
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -41,7 +43,7 @@ drawsSchedule.scheduleDraws();
 const spinnUp = async () => {
 	try {
 		await mongoose.connect(
-			`mongodb+srv://bruinen:${process.env.MONGO_PASSWORD}@nodecourse-wx0jk.gcp.mongodb.net/gifts`,
+			`mongodb+srv://bruinen:${ENV.MONGO_PASSWORD}@nodecourse-wx0jk.gcp.mongodb.net/gifts`,
 			{
 				useNewUrlParser: true,
 				useUnifiedTopology: true,

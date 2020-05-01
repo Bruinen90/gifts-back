@@ -6,10 +6,7 @@ const crypto = require("crypto");
 
 // Send grid config
 const sgMail = require("@sendgrid/mail");
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-sgMail.setApiKey(
-    "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"
-);
+sgMail.setApiKey(ENV.SENDGRID_API_KEY);
 
 // Models
 const User = require("../../models/User");
@@ -144,7 +141,6 @@ module.exports = {
             await sgMail.send(mailOptions, (error, result) => {
                 if (error) return { success: false };
             });
-            // Saving token to DB
             const tokenExpDate = Date.now() + 3600000;
             userToReset.passwordResetToken = token;
             userToReset.passwordResetTokenExpDate = tokenExpDate;
