@@ -132,23 +132,29 @@ module.exports = {
 			const resetLink = `${domain}/utworz-haslo/?${email}#${token}`;
 			const mailOptions = {
 				to: email,
-				from: `reset@${domain}`,
+				from: 'reset@bez-niespodzianek.webb.app',
 				subject: 'Reset hasła bez-niespodzianek',
 				templateId: 'd-d575c8f9688b492ea6bcbf9b2b11e548',
 				dynamic_template_data: {
 					logoLinkTarget: domain,
 					header: 'Reset hasła',
-					message: `Witaj ${userToReset.username}. W serwisie bez niespodzianek zażądano zresetowania Twojego hasła \n 
-                    Jeśli nie prosiłeś o reset hasła zignorują tą wiadomość, Twoje hasło pozostanie bez zmian.
-                    Aby ustawić nowe hasło kliknij w ten link lub skopiuj go do okna przeglądarki: ${resetLink} \n\n `,
+					message: `Witaj ${userToReset.username}. W serwisie bez niespodzianek zażądano zresetowania Twojego hasła \n
+				    Jeśli nie prosiłeś o reset hasła zignorują tą wiadomość, Twoje hasło pozostanie bez zmian.
+				    Aby ustawić nowe hasło kliknij w ten link lub skopiuj go do okna przeglądarki: ${resetLink} \n\n `,
 					link: resetLink,
 					unsubscribeLink: `${domain}/wypisz-sie`,
 				},
 			};
 
-			await sgMail.send(mailOptions, (error, result) => {
-				if (error) return { success: false };
-			});
+			const sendGridResponse = await sgMail.send(
+				mailOptions,
+				(error, result) => {
+					if (error) {
+						console.log(error.response.body);
+						return { success: false };
+					}
+				}
+			);
 			const tokenExpDate = Date.now() + 3600000;
 			userToReset.passwordResetToken = token;
 			userToReset.passwordResetTokenExpDate = tokenExpDate;
