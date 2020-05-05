@@ -17,6 +17,7 @@ const UserSchema = new Schema({
     passwordResetToken: String,
     passwordResetTokenExpDate: Date,
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    unsubscribed: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("User", UserSchema);
