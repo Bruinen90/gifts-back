@@ -18,14 +18,6 @@ const throwAuthError = errorMessage => {
 	throw error;
 };
 
-const throwServerError = errorMessage => {
-	const error = new Error(
-		errorMessage || 'Internal server error, please try again later'
-	);
-	error.code = 500;
-	throw error;
-};
-
 module.exports = {
 	createUser: async ({ userInput }, req) => {
 		const errors = [];
@@ -102,6 +94,7 @@ module.exports = {
 			userId: user._id.toString(),
 			username: user.username,
 			email: user.email,
+			unsubscribed: user.unsubscribed,
 		};
 	},
 
@@ -194,5 +187,72 @@ module.exports = {
 		userToReset.password = hashedPassword;
 		await userToReset.save();
 		return { success: true, message: 'New password properly saved' };
+	},
+
+	changePassword: async ({ changePasswordInput }, req) => {
+		const { userId } = req;
+		const { oldPassword, newPassword } = changePasswordInput;
+		if (!validator.isLength(newPassword, { min: 5 })) {
+			return {
+				success: false,
+				message:
+					'New password is too short - it should be at least 5 charactes long',
+			};
+		}
+		try {
+			const editedUser = await User.findById(userId);
+			const passwordCorrect = await bcrypt.compare(
+				oldPassword,
+				editedUser.password
+			);
+			if (!editedUser || !passwordCorrect) {
+				return { success: false, message: 'Not authenticated' };
+			}
+			const newPasswordHashed = await bcrypt.hash(newPassword, 12);
+			editedUser.password = newPasswordHashed;
+			await editedUser.save();
+			return { success: true };
+		} catch (err) {
+			console.log(err);
+			return {
+				success: false,
+				message: 'Server error, please try again later',
+			};
+		}
+	},
+
+	changeEmail: async ({ changeEmailInput }, req) => {
+		const { userId } = req;
+		const { newEmail, unsubscribed, password } = changeEmailInput;
+		if (newEmail && !validator.isEmail(newEmail)) {
+			return { success: false, message: 'Invalid email address' };
+		}
+		try {
+			const editedUser = await User.findById(userId);
+			editedUser.unsubscribed = unsubscribed;
+			if (newEmail) {
+				const passwordCorrect = await bcrypt.compare(
+					password,
+					editedUser.password
+				);
+				const alreadyExists = await User.findOne({ email: newEmail });
+				if (!editedUser || !passwordCorrect || alreadyExists) {
+					return {
+						success: false,
+						message:
+							'Invalid auth data or user with that email adress already exists',
+					};
+				}
+				editedUser.email = newEmail;
+			}
+			await editedUser.save();
+			return { success: true };
+		} catch (err) {
+			console.log(err);
+			return {
+				success: false,
+				message: 'Server error, please try again later',
+			};
+		}
 	},
 };
