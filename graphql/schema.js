@@ -1,4 +1,4 @@
-const { buildSchema } = require('graphql');
+const { buildSchema } = require("graphql");
 
 module.exports = buildSchema(`
     type DrawResults {
@@ -17,6 +17,8 @@ module.exports = buildSchema(`
         participants: [User]
         results: DrawResults
         status: String
+        createdAt: String
+        updatedAt: String
     }
 
     type User {
@@ -38,6 +40,7 @@ module.exports = buildSchema(`
         creator: ID!
         buyer: ID
         reserved: Boolean
+        updatedAt: String
     }
 
     type WishPopulated {
@@ -49,6 +52,7 @@ module.exports = buildSchema(`
         price: Int
         creator: User!
         forDraw: ID
+        updatedAt: String
     }
 
     type Invitation {
