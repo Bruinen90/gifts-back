@@ -61,7 +61,32 @@ module.exports = {
 			email: userInput.email,
 			password: hashedPassword,
 		});
+
+		// SEND EMAIL
+		const domain = req.headers.origin;
+		const mailOptions = {
+			to: userInput.email,
+			from: 'no-replay@bez-niespodzianek.webb.app',
+			subject: 'Witaj w serwisie Bez Niespodzianek',
+			templateId: 'd-74ea6a6c2ec74c6cb9d204f8b47efdc7',
+			dynamic_template_data: {
+				logoLinkTarget: domain,
+				header: 'Witaj',
+				username: userInput.username,
+				message: `Dziękujemy za dołączenie do Bez Niespodzianek! Od teraz możesz korzystać z serwisu - tworzyć i brać udział w losowaniach, zapraszać znajomych oraz sprawdzać ich listę życzeń. Czas nietrafionych prezentów właśnie się skończył!`,
+				unsubscribeLink: `${domain}/wypisz-sie`,
+			},
+		};
+
+		await sgMail.send(mailOptions, (error, result) => {
+			if (error) {
+				console.log(error.response.body);
+				return { success: false };
+			}
+		});
+
 		const createdUser = await user.save();
+
 		return { ...createdUser._doc, _id: createdUser._id.toString() };
 	},
 
@@ -139,15 +164,12 @@ module.exports = {
 				},
 			};
 
-			const sendGridResponse = await sgMail.send(
-				mailOptions,
-				(error, result) => {
-					if (error) {
-						console.log(error.response.body);
-						return { success: false };
-					}
+			await sgMail.send(mailOptions, (error, result) => {
+				if (error) {
+					console.log(error.response.body);
+					return { success: false };
 				}
-			);
+			});
 			const tokenExpDate = Date.now() + 3600000;
 			userToReset.passwordResetToken = token;
 			userToReset.passwordResetTokenExpDate = tokenExpDate;
