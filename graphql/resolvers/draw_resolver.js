@@ -149,29 +149,32 @@ module.exports = {
                             participant._id.toString()
                     ).getter;
                     return {
+                        username: participant.username,
                         email: participant.email,
-                        result: participantResult.username,
+                        resultUsername: participantResult.username,
                     };
                 }
             );
             // IMPORTANT TODO: make email template for draw results!
-            const generateMailOptions = (email, resultUsername) => ({
+            const domain = req.headers.origin;
+
+            const generateMailOptions = (username, email, resultUsername) => ({
                 to: email,
-                from: "wyniki@bez-niespodzianek.webb.app",
+                from: `wyniki@${domain}`,
                 subject: "Wyniki losowania bez-niespodzianek",
-                templateId: "d-d575c8f9688b492ea6bcbf9b2b11e548",
+                templateId: "d-c36c087cd3524834abeb671abaa1ad1a",
                 dynamic_template_data: {
-                    logoLinkTarget: "test",
+                    logoLinkTarget: `${domain}/moje-losowania`,
                     header: "Zakończenie losowania",
-                    message: `Wylosowałeś użytkownika ${resultUsername}`,
-                    link: 'test',
-                    unsubscribeLink: `test/wypisz-sie`,
+                    username: username,
+                    resultName: resultUsername,
+                    unsubscribeLink: `${domain}/wypisz-sie?token=${createdUser.emailLinksToken}`,
                 },
             });
 
             for (const email of emailsArray) {
                 await sgMail.send(
-                    generateMailOptions(email.email, email.result),
+                    generateMailOptions(email.username, email.email, email.resultUsername, email.resultNumber),
                     (error, result) => {
                         if (error) {
                             throw new Error(
