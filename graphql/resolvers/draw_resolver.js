@@ -1,4 +1,9 @@
 const RunDraw = require("../../scripts/RunDraw");
+const ENV = require("../../env/env");
+
+// Send grid config
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(ENV.SENDGRID_API_KEY);
 
 // Models
 const Draw = require("../../models/Draw");
@@ -130,14 +135,61 @@ module.exports = {
                 "You are not authenticated to run draws created by other user"
             );
         }
-        const drawWithResults = await RunDraw.execute(
-            draw.participants,
-            drawId
-        );
-        const creatorResults = drawWithResults.results.find(
-            (result) => result.giver.toString() === req.userId.toString()
-        );
-        return creatorResults.getter;
+        try {
+            const drawWithResults = await RunDraw.execute(
+                draw.participants,
+                drawId
+            );
+            // SEND EMAIL TO EACH PARTICIPANT WHO DID NOT CANCEL EMAILS
+            const emailsArray = drawWithResults.participants.map(
+                (participant) => {
+                    const participantResult = drawWithResults.results.find(
+                        (result) =>
+                            result.giver.toString() ===
+                            participant._id.toString()
+                    ).getter;
+                    return {
+                        email: participant.email,
+                        result: participantResult.username,
+                    };
+                }
+            );
+            // IMPORTANT TODO: make email template for draw results!
+            const generateMailOptions = (email, resultUsername) => ({
+                to: email,
+                from: "wyniki@bez-niespodzianek.webb.app",
+                subject: "Wyniki losowania bez-niespodzianek",
+                templateId: "d-d575c8f9688b492ea6bcbf9b2b11e548",
+                dynamic_template_data: {
+                    logoLinkTarget: "test",
+                    header: "Zakończenie losowania",
+                    message: `Wylosowałeś użytkownika ${resultUsername}`,
+                    link: 'test',
+                    unsubscribeLink: `test/wypisz-sie`,
+                },
+            });
+
+            for (const email of emailsArray) {
+                await sgMail.send(
+                    generateMailOptions(email.email, email.result),
+                    (error, result) => {
+                        if (error) {
+                            throw new Error(
+                                "Error during emails sending: ",
+                                error
+                            );
+                        }
+                    }
+                );
+            }
+
+            const creatorResults = drawWithResults.results.find(
+                (result) => result.giver.toString() === req.userId.toString()
+            );
+            return creatorResults.getter;
+        } catch (err) {
+            console.log(err);
+        }
     },
 
     archiveDraw: async ({ drawId }, req) => {
