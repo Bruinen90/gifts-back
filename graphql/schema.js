@@ -143,6 +143,11 @@ module.exports = buildSchema(`
         password: String
     }
 
+    input UnsubscribeInput {
+        email: String!
+        token: String!
+    }
+
     type RootMutation {
         createUser(userInput: SignUpInputData): User!
         createDraw(drawInput: DrawInput): Draw!
@@ -161,6 +166,7 @@ module.exports = buildSchema(`
         setNewPassword(newPasswordInput: NewPasswordInput!): SuccessResult
         changePassword(changePasswordInput: ChangePasswordInput!): SuccessResult
         changeEmail(changeEmailInput: ChangeEmailInput!): SuccessResult
+        unsubscribe(unsubscribeInput: UnsubscribeInput): SuccessResult
     }
 
     type RootQuery {
