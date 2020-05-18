@@ -7,9 +7,7 @@ module.exports = (req, res, next) => {
 		return next();
 	};
 	const authHeader = req.get('Authorization');
-	// console.log('authHeader: ', authHeader);
 	if (!authHeader) {
-		// console.log('1111');
 		return breakMiddleware();
 	}
 	const token = authHeader;
@@ -17,11 +15,9 @@ module.exports = (req, res, next) => {
 	try {
 		decodedToken = jws.verify(token, ENV.jwtSecret);
 	} catch (error) {
-		// console.log('22222');
 		return breakMiddleware();
 	}
 	if (!decodedToken) {
-		// console.log('3333');
 		return breakMiddleware();
 	}
 	req.userId = decodedToken.userId;
