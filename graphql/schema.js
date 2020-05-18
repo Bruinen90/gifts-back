@@ -176,6 +176,7 @@ module.exports = buildSchema(`
         userWishes(userId: ID): [Wish]
         getUserFriends: [User]
         getShoppingList: [WishPopulated]
+        verifyToken: SuccessResult
     }
 
     schema {
