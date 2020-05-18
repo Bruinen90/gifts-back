@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon -r dotenv/config app.js"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@playlyfe/gql": "^2.6.2",
+    "dotenv": "^8.2.0",
     "nodemon": "^1.19.4"
   }
 }
