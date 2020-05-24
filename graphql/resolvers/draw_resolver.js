@@ -165,7 +165,7 @@ module.exports = {
 				resultUsername
 			) => ({
 				to: email,
-				from: `wyniki@${domain}`,
+				from: `wyniki@bez-niespodzianek.webb.app`,
 				subject: 'Wyniki losowania bez-niespodzianek',
 				templateId: 'd-c36c087cd3524834abeb671abaa1ad1a',
 				dynamic_template_data: {
@@ -188,10 +188,13 @@ module.exports = {
 						),
 						(error, result) => {
 							if (error) {
-								throw new Error(
-									'Error during emails sending: ',
-									error
+								console.log(
+									'ERROR: ',
+									error.response.body.errors,
+									'RESULT: ',
+									result
 								);
+								throw new Error('Error during emails sending');
 							}
 						}
 					);
