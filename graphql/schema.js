@@ -38,7 +38,7 @@ module.exports = buildSchema(`
         description: String
         price: Int
         creator: ID!
-        buyer: ID
+        buyer: User
         reserved: Boolean
         updatedAt: String
     }
