@@ -1,4 +1,4 @@
-const { buildSchema } = require("graphql");
+const { buildSchema } = require('graphql');
 
 module.exports = buildSchema(`
     type DrawResults {
@@ -40,6 +40,7 @@ module.exports = buildSchema(`
         creator: ID!
         buyer: User
         reserved: Boolean
+        done: Boolean
         updatedAt: String
     }
 
@@ -53,6 +54,7 @@ module.exports = buildSchema(`
         creator: User!
         forDraw: ID
         updatedAt: String
+        done: Boolean
     }
 
     type Invitation {
@@ -148,6 +150,11 @@ module.exports = buildSchema(`
         token: String!
     }
 
+    input WishDoneInput {
+        wishId: ID!
+        done: Boolean!
+    }
+
     type RootMutation {
         createUser(userInput: SignUpInputData): User!
         createDraw(drawInput: DrawInput): Draw!
@@ -167,6 +174,7 @@ module.exports = buildSchema(`
         changePassword(changePasswordInput: ChangePasswordInput!): SuccessResult
         changeEmail(changeEmailInput: ChangeEmailInput!): SuccessResult
         unsubscribe(unsubscribeInput: UnsubscribeInput): SuccessResult
+        setWishDone(input: WishDoneInput): SuccessResult
     }
 
     type RootQuery {

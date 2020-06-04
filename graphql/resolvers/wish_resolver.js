@@ -167,4 +167,28 @@ module.exports = {
 		);
 		return wishesToBuy;
 	},
+
+	setWishDone: async ({ input }, req) => {
+		const { wishId, done } = input;
+		const { userId } = req;
+		try {
+			const wish = await Wish.findOne({
+				_id: wishId,
+				$or: [{ creator: userId }, { buyer: userId }],
+			});
+			if (!wish) {
+				return { success: false, message: 'Not authenticated' };
+			}
+			wish.done = done;
+			await wish.save();
+			console.log(wish);
+			return {
+				success: true,
+				message: 'Wish done status updated correctly',
+			};
+		} catch (err) {
+			console.log(err);
+			return { success: false, message: 'Internal server errror' };
+		}
+	},
 };
