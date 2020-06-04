@@ -181,7 +181,6 @@ module.exports = {
 			}
 			wish.done = done;
 			await wish.save();
-			console.log(wish);
 			return {
 				success: true,
 				message: 'Wish done status updated correctly',
