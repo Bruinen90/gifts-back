@@ -68,7 +68,10 @@ module.exports = {
 		const domain = req.headers.origin;
 		const mailOptions = {
 			to: userInput.email,
-			from: 'no-replay@bez-niespodzianek.webb.app',
+			from: {
+				email: 'no-replay@bez-niespodzianek.webb.app',
+				name: 'Bez-niespodzianek',
+			},
 			subject: 'Witaj w serwisie Bez Niespodzianek',
 			templateId: 'd-74ea6a6c2ec74c6cb9d204f8b47efdc7',
 			dynamic_template_data: {
