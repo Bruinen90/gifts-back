@@ -1,12 +1,13 @@
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const ENV = require('../../env/env');
+// const ENV = require('../../env/env');
 const crypto = require('crypto');
 
 // Send grid config
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(ENV.SENDGRID_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Models
 const User = require('../../models/User');
@@ -92,40 +93,51 @@ module.exports = {
 	},
 
 	login: async ({ userInput }, req) => {
-		let user = await User.findOne({ email: userInput.usernameOrEmail });
-		if (!user) {
-			user = await User.findOne({ username: userInput.usernameOrEmail });
+		try {
+			let user = await User.findOne({ email: userInput.usernameOrEmail });
 			if (!user) {
-				const error = new Error('User not found');
+				console.log('No user found');
+				user = await User.findOne({
+					username: userInput.usernameOrEmail,
+				});
+				if (!user) {
+					const error = new Error('User not found');
+					error.code = 401;
+					throw error;
+				}
+			}
+			const isEqual = await bcrypt.compare(
+				userInput.password,
+				user.password
+			);
+			if (!isEqual) {
+				const error = new Error('Invalid password');
 				error.code = 401;
 				throw error;
 			}
-		}
-		const isEqual = await bcrypt.compare(userInput.password, user.password);
-		if (!isEqual) {
-			const error = new Error('Invalid password');
-			error.code = 401;
-			throw error;
-		}
-		const token = jwt.sign(
-			{
+			const token = jwt.sign(
+				{
+					userId: user._id.toString(),
+					email: user.email,
+					username: user.username,
+				},
+				process.env.JWT_SECRET
+			);
+			return {
+				token: token,
 				userId: user._id.toString(),
-				email: user.email,
 				username: user.username,
-			},
-			ENV.jwtSecret
-		);
-		return {
-			token: token,
-			userId: user._id.toString(),
-			username: user.username,
-			email: user.email,
-			unsubscribed: user.unsubscribed,
-		};
+				email: user.email,
+				unsubscribed: user.unsubscribed,
+			};
+		} catch (err) {
+			console.log(err);
+		}
 	},
 
 	verifyToken: async (_, req) => {
 		if (req.isAuth && req.userId) {
+			console.log('AUTH:', req.isAuth);
 			try {
 				const user = await User.findById(req.userId);
 				const { _id, username, email, unsubscribed } = user;
@@ -167,9 +179,10 @@ module.exports = {
 			const resetLink = `${domain}/utworz-haslo/?${email}#${token}`;
 			const mailOptions = {
 				to: email,
-				from: 'reset@bez-niespodzianek.webb.app',
-				subject: 'Reset hasła bez-niespodzianek',
-				templateId: 'd-d575c8f9688b492ea6bcbf9b2b11e548',
+				from: 'info@bruinen.pl',
+				fromname: 'Bez-niespodzianek',
+				subject: 'Reset hasła',
+				templateId: 'd-c1fd7e5c2d094077864120105bb2eedd',
 				dynamic_template_data: {
 					logoLinkTarget: domain,
 					header: 'Reset hasła',

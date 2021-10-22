@@ -1,9 +1,9 @@
 const RunDraw = require('../../scripts/RunDraw');
-const ENV = require('../../env/env');
+// const ENV = require('../../env/env');
 
 // Send grid config
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(ENV.SENDGRID_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Models
 const Draw = require('../../models/Draw');
