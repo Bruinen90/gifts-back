@@ -101,7 +101,9 @@ module.exports = {
 					username: userInput.usernameOrEmail,
 				});
 				if (!user) {
-					const error = new Error('User not found');
+					const error = new Error(
+						'User not found, please, check login'
+					);
 					error.code = 401;
 					throw error;
 				}
