@@ -2,8 +2,8 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-// const ENV = require('../../env/env');
 const crypto = require('crypto');
+const { OAuth2Client } = require('google-auth-library');
 
 // Send grid config
 const sgMail = require('@sendgrid/mail');
@@ -134,6 +134,60 @@ module.exports = {
 			};
 		} catch (err) {
 			console.log(err);
+		}
+	},
+
+	loginWithGoogle: async ({ googleIdToken }, req) => {
+		const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+		const verify = async () => {
+			const ticket = await client.verifyIdToken({
+				idToken: googleIdToken.googleIdToken,
+				audience: process.env.GOOGLE_CLIENT_ID,
+			});
+			const payload = ticket.getPayload();
+			const userid = payload['sub'];
+			if (payload['email_verified']) {
+				return payload['email'];
+			} else {
+				return false;
+			}
+		};
+		try {
+			const verifiedEmail = await verify();
+			if (verifiedEmail) {
+				const userForGoogleEmail = await User.findOne({
+					email: verifiedEmail,
+				});
+				if (userForGoogleEmail) {
+					const token = jwt.sign(
+						{
+							userId: userForGoogleEmail._id.toString(),
+							email: userForGoogleEmail.email,
+							username: userForGoogleEmail.username,
+						},
+						process.env.JWT_SECRET
+					);
+					return {
+						token: token,
+						userId: userForGoogleEmail._id.toString(),
+						username: userForGoogleEmail.username,
+						email: userForGoogleEmail.email,
+						unsubscribed: userForGoogleEmail.unsubscribed,
+					};
+				} else {
+					const error = new Error(
+						'No account found for that email adress'
+					);
+					error.code = 404;
+					throw error;
+				}
+			} else {
+				const error = new Error('Google auth failed');
+				error.code = 404;
+				throw error;
+			}
+		} catch (err) {
+			console.log('ERROR DURING TOKEN VERIFICATION', err);
 		}
 	},
 

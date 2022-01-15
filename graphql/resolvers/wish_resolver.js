@@ -1,4 +1,4 @@
-const rp = require('request-promise');
+const got = require('got');
 
 // Models
 const Draw = require('../../models/Draw');
@@ -21,9 +21,9 @@ module.exports = {
 			let imageUrl;
 			try {
 				if (wishInput.link && wishInput.link.startsWith('http')) {
-					const html = await rp(wishInput.link);
+					const gotResponse = await got(wishInput.link);
 					const matchesArr = [
-						...html.matchAll(
+						...gotResponse.body.matchAll(
 							/(?:<meta (?:itemprop="(?:image|og:image)"|property="(?:image|og:image)") content=["'])(.*?)["']/gim
 						),
 					];

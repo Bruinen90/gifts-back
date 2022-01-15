@@ -76,6 +76,10 @@ module.exports = buildSchema(`
         unsubscribed: Boolean
     }
 
+    input GoogleIdToken {
+        googleIdToken: String!
+    }
+
     type DrawsList {
         drawsList: [Draw]!
     }
@@ -179,6 +183,7 @@ module.exports = buildSchema(`
 
     type RootQuery {
         login(userInput: SignInInputData): AuthData!
+        loginWithGoogle(googleIdToken: GoogleIdToken): AuthData
         userDraws: DrawsList!
         findUser(searchPhrase: String): [User]
         userWishes(userId: ID): [Wish]
