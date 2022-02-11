@@ -93,6 +93,10 @@ module.exports = buildSchema(`
         _id: ID!
     }
 
+    type ItemData {
+        itemPrice: String
+    }
+
     input SignUpInputData {
         username: String!
         email: String!
@@ -189,7 +193,8 @@ module.exports = buildSchema(`
         userWishes(userId: ID): [Wish]
         getUserFriends: [User]
         getShoppingList: [WishPopulated]
-        verifyToken(token: String!): User! 
+        verifyToken(token: String!): User!
+        getAllegroItemData(itemId: String!): ItemData
     }
 
     schema {

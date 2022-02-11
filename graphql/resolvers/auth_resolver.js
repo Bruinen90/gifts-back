@@ -242,9 +242,9 @@ module.exports = {
 				dynamic_template_data: {
 					logoLinkTarget: domain,
 					header: 'Reset hasła',
-					message: `Witaj ${userToReset.username}. W serwisie bez niespodzianek zażądano zresetowania Twojego hasła \n
+					message: `Witaj ${userToReset.username}. W serwisie bez niespodzianek zażądano zresetowania Twojego hasła <br>
 				    Jeśli nie prosiłeś o reset hasła zignorują tą wiadomość, Twoje hasło pozostanie bez zmian.
-				    Aby ustawić nowe hasło kliknij w ten link lub skopiuj go do okna przeglądarki: ${resetLink} \n\n `,
+				    Aby ustawić nowe hasło kliknij w ten link lub skopiuj go do okna przeglądarki: ${resetLink} <br><br> `,
 					link: resetLink,
 					unsubscribeLink: `${domain}/wypisz-sie?email=${userToReset.email}?token=${userToReset.emailLinksToken}`,
 				},

@@ -1,8 +1,13 @@
+require('dotenv').config();
 const got = require('got');
 
 // Models
 const Draw = require('../../models/Draw');
 const Wish = require('../../models/Wish');
+
+// Allegro API
+const ARC = require('allegro-rest-client');
+const { AllegroRestClient, ClientConfig, ClientOptions } = ARC;
 
 // Errors
 const throwAuthError = errorMessage => {
@@ -189,5 +194,9 @@ module.exports = {
 			console.log(err);
 			return { success: false, message: 'Internal server errror' };
 		}
+	},
+
+	getAllegroItemData: async ({ itemId }, req) => {
+		console.log('ALLEGRO ITEM ID: ', itemId);
 	},
 };
