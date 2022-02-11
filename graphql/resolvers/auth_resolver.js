@@ -21,74 +21,92 @@ const throwAuthError = errorMessage => {
 
 module.exports = {
 	createUser: async ({ userInput }, req) => {
-		const errors = [];
-		if (!validator.isEmail(userInput.email)) {
-			errors.push({ message: 'Invalid email' });
-		}
-		if (
-			validator.isEmpty(userInput.password) ||
-			!validator.isLength(userInput.password, { min: 5 })
-		) {
-			errors.push({
-				message: 'Password should be at least 5 characters long',
-			});
-		}
-		if (!validator.isLength(userInput.username, { min: 3, max: 30 })) {
-			errors.push({
-				message:
-					'Username should be at least 3 and maximum 30 characters long',
-			});
-		}
-		if (errors.length > 0) {
-			const errorsList = errors.map(error => error.message).join('. ');
-			const error = new Error('Invalid input. ' + errorsList);
-			throw error;
-		}
-		const existingUsername = await User.findOne({
-			username: userInput.username,
-		});
-		if (existingUsername) {
-			const error = new Error('Login taken');
-			throw error;
-		}
-		const existingEmail = await User.findOne({ email: userInput.email });
-		if (existingEmail) {
-			const error = new Error('Email taken');
-			throw error;
-		}
-		const hashedPassword = await bcrypt.hash(userInput.password, 12);
-		const user = new User({
-			username: userInput.username,
-			email: userInput.email,
-			password: hashedPassword,
-		});
-
-		const createdUser = await user.save();
-
-		// SEND EMAIL
-		const domain = req.headers.origin;
-		const mailOptions = {
-			to: email,
-			from: 'info@bruinen.pl',
-			fromname: 'Bez-niespodzianek',
-			subject: 'Witaj w Bez-niespodzianek',
-			templateId: 'd-6cce88f2b2c64c469f99bcc735e8e1d3 ',
-			dynamic_template_data: {
-				logoLinkTarget: domain,
-				header: 'Witaj w serwisie Bez-niespodzianek',
-				message: `Twoje konto zostalo utworzone i możesz korzystać ze wszystkich funkcji serwisu Bez-niespodzianek. Czas nietrafionych prezentów właśnie się skończył! Już teraz dodaj znajomych, zacznij dodawać życzenia i tworzyć losowania.`,
-				unsubscribeLink: `${domain}/wypisz-sie?email=${createdUser._doc.email}?token=${createdUser._doc.emailLinksToken}`,
-			},
-		};
-
-		await sgMail.send(mailOptions, (error, result) => {
-			if (error) {
-				console.log(error.response.body);
-				return { success: false };
+		try {
+			const errors = [];
+			if (!validator.isEmail(userInput.email)) {
+				errors.push({ message: 'Invalid email' });
 			}
-		});
+			if (
+				validator.isEmpty(userInput.password) ||
+				!validator.isLength(userInput.password, { min: 5 })
+			) {
+				errors.push({
+					message: 'Password should be at least 5 characters long',
+				});
+			}
+			if (!validator.isLength(userInput.username, { min: 3, max: 30 })) {
+				errors.push({
+					message:
+						'Username should be at least 3 and maximum 30 characters long',
+				});
+			}
+			if (errors.length > 0) {
+				const errorsList = errors
+					.map(error => error.message)
+					.join('. ');
+				const error = new Error('Invalid input. ' + errorsList);
+				throw error;
+			}
+			const existingUsername = await User.findOne({
+				username: userInput.username,
+			});
+			if (existingUsername) {
+				const error = new Error('Login taken');
+				throw error;
+			}
+			const existingEmail = await User.findOne({
+				email: userInput.email,
+			});
+			if (existingEmail) {
+				const error = new Error('Email taken');
+				throw error;
+			}
+			const hashedPassword = await bcrypt.hash(userInput.password, 12);
+			const user = new User({
+				username: userInput.username,
+				email: userInput.email,
+				password: hashedPassword,
+			});
 
-		return { ...createdUser._doc, _id: createdUser._id.toString() };
+			const createdUser = await user.save();
+
+			// SEND EMAIL
+			console.log('SENDING EMAIL');
+			const domain = req.headers.origin;
+			console.log(
+				domain,
+				createdUser.email,
+				createdUser.emailLinksToken,
+				createdUser._doc
+			);
+			const mailOptions = {
+				to: createdUser.email,
+				from: 'info@bruinen.pl',
+				fromname: 'Bez-niespodzianek',
+				subject: 'Witaj w Bez-niespodzianek',
+				templateId: 'd-6cce88f2b2c64c469f99bcc735e8e1d3',
+				dynamic_template_data: {
+					logoLinkTarget: domain,
+					header: 'Witaj w serwisie Bez-niespodzianek',
+					message: `Twoje konto zostalo utworzone i możesz korzystać ze wszystkich funkcji serwisu Bez-niespodzianek. Czas nietrafionych prezentów właśnie się skończył! Już teraz dodaj znajomych, zacznij dodawać życzenia i tworzyć losowania.`,
+					unsubscribeLink: `${domain}/wypisz-sie?email=${createdUser.email}?token=${createdUser.emailLinksToken}`,
+				},
+			};
+
+			await sgMail.send(mailOptions, (error, result) => {
+				if (error) {
+					console.log(
+						'ERROR DURING SENDING REGISTER EMAIL',
+						error.response.body
+					);
+					return { success: false };
+				}
+			});
+
+			return { ...createdUser._doc, _id: createdUser._id.toString() };
+		} catch (err) {
+			console.log(err);
+		}
 	},
 
 	login: async ({ userInput }, req) => {
