@@ -77,7 +77,7 @@ module.exports = {
 				logoLinkTarget: domain,
 				header: 'Witaj w serwisie Bez-niespodzianek',
 				message: `Twoje konto zostalo utworzone i możesz korzystać ze wszystkich funkcji serwisu Bez-niespodzianek. Czas nietrafionych prezentów właśnie się skończył! Już teraz dodaj znajomych, zacznij dodawać życzenia i tworzyć losowania.`,
-				unsubscribeLink: `${domain}/wypisz-sie?email=${createdUser.email}?token=${createdUser.emailLinksToken}`,
+				unsubscribeLink: `${domain}/wypisz-sie?email=${createdUser._doc.email}?token=${createdUser._doc.emailLinksToken}`,
 			},
 		};
 
