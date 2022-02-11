@@ -68,16 +68,15 @@ module.exports = {
 		// SEND EMAIL
 		const domain = req.headers.origin;
 		const mailOptions = {
-			to: userInput.email,
-			from: 'no-replay@bez-niespodzianek.webb.app',
+			to: email,
+			from: 'info@bruinen.pl',
 			fromname: 'Bez-niespodzianek',
-			subject: 'Witaj w serwisie Bez Niespodzianek',
-			templateId: 'd-74ea6a6c2ec74c6cb9d204f8b47efdc7',
+			subject: 'Witaj w Bez-niespodzianek',
+			templateId: 'd-6cce88f2b2c64c469f99bcc735e8e1d3 ',
 			dynamic_template_data: {
 				logoLinkTarget: domain,
-				header: 'Witaj',
-				username: userInput.username,
-				message: `Dziękujemy za dołączenie do Bez Niespodzianek! Od teraz możesz korzystać z serwisu - tworzyć i brać udział w losowaniach, zapraszać znajomych oraz sprawdzać ich listę życzeń. Czas nietrafionych prezentów właśnie się skończył!`,
+				header: 'Witaj w serwisie Bez-niespodzianek',
+				message: `Twoje konto zostalo utworzone i możesz korzystać ze wszystkich funkcji serwisu Bez-niespodzianek. Czas nietrafionych prezentów właśnie się skończył! Już teraz dodaj znajomych, zacznij dodawać życzenia i tworzyć losowania.`,
 				unsubscribeLink: `${domain}/wypisz-sie?email=${createdUser.email}?token=${createdUser.emailLinksToken}`,
 			},
 		};
@@ -242,7 +241,7 @@ module.exports = {
 				dynamic_template_data: {
 					logoLinkTarget: domain,
 					header: 'Reset hasła',
-					message: `Witaj ${userToReset.username}. W serwisie bez niespodzianek zażądano zresetowania Twojego hasła <br>
+					message: `Witaj ${userToReset.username}. W serwisie bez niespodzianek zażądano zresetowania Twojego hasła <br><br>
 				    Jeśli nie prosiłeś o reset hasła zignorują tą wiadomość, Twoje hasło pozostanie bez zmian.
 				    Aby ustawić nowe hasło kliknij w ten link lub skopiuj go do okna przeglądarki: ${resetLink} <br><br> `,
 					link: resetLink,
