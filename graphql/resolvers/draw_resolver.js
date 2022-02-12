@@ -169,11 +169,11 @@ module.exports = {
 				from: 'info@bruinen.pl',
 				fromname: 'Bez-niespodzianek',
 				subject: 'Witaj w Bez-niespodzianek',
-				templateId: 'd-159d34729a634d32be97712af0fd230f ',
+				templateId: 'd-159d34729a634d32be97712af0fd230f',
 				dynamic_template_data: {
 					logoLinkTarget: domain,
 					header: 'Wyniki losowania w serwisie Bez-niespodzianek',
-					message: `Losowaie <b>${drawTitle}</b> dobiegło końca, wylosowałeś użytkownika`,
+					message: `Losowaie <b>${drawTitle}</b> dobiegło końca, wylosowałeś użytkownika: `,
 					username: username,
 					unsubscribeLink: `${domain}/wypisz-sie?email=${resultUsername}?token=${resultToken}`,
 				},
