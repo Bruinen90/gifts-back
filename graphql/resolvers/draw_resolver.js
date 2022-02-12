@@ -161,19 +161,21 @@ module.exports = {
 			const generateMailOptions = (
 				username,
 				email,
+				drawTitle,
 				resultToken,
 				resultUsername
 			) => ({
 				to: email,
-				from: `wyniki@bez-niespodzianek.webb.app`,
-				subject: 'Wyniki losowania bez-niespodzianek',
-				templateId: 'd-c36c087cd3524834abeb671abaa1ad1a',
+				from: 'info@bruinen.pl',
+				fromname: 'Bez-niespodzianek',
+				subject: 'Witaj w Bez-niespodzianek',
+				templateId: 'd-159d34729a634d32be97712af0fd230f ',
 				dynamic_template_data: {
-					logoLinkTarget: `${domain}/moje-losowania`,
-					header: 'Zakończenie losowania',
+					logoLinkTarget: domain,
+					header: 'Wyniki losowania w serwisie Bez-niespodzianek',
+					message: `Losowaie <b>${drawTitle}</b> dobiegło końca, wylosowałeś użytkownika`,
 					username: username,
-					resultName: resultUsername,
-					unsubscribeLink: `${domain}/wypisz-sie?email=${email}?token=${resultToken}`,
+					unsubscribeLink: `${domain}/wypisz-sie?email=${resultUsername}?token=${resultToken}`,
 				},
 			});
 
@@ -183,6 +185,7 @@ module.exports = {
 						generateMailOptions(
 							email.username,
 							email.email,
+							draw.title,
 							email.emailToken,
 							email.resultUsername
 						),

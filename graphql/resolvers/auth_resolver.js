@@ -71,14 +71,7 @@ module.exports = {
 			const createdUser = await user.save();
 
 			// SEND EMAIL
-			console.log('SENDING EMAIL');
 			const domain = req.headers.origin;
-			console.log(
-				domain,
-				createdUser.email,
-				createdUser.emailLinksToken,
-				createdUser._doc
-			);
 			const mailOptions = {
 				to: createdUser.email,
 				from: 'info@bruinen.pl',
@@ -99,7 +92,6 @@ module.exports = {
 						'ERROR DURING SENDING REGISTER EMAIL',
 						error.response.body
 					);
-					return { success: false };
 				}
 			});
 
