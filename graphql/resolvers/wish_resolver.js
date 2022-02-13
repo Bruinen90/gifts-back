@@ -2,8 +2,12 @@ require('dotenv').config();
 const got = require('got');
 
 // Models
+const User = require('../../models/User');
 const Draw = require('../../models/Draw');
 const Wish = require('../../models/Wish');
+
+// Notification generator
+const notificationGenerator = require('./notification_generator');
 
 // Allegro API
 const ARC = require('allegro-rest-client');
@@ -131,6 +135,7 @@ module.exports = {
 		}
 		try {
 			const desiredWish = await Wish.findById(wishId);
+			const userReseving = await User.findById(userId);
 			if (reserved) {
 				if (desiredWish.reserved) {
 					throwAuthError(
@@ -141,6 +146,25 @@ module.exports = {
 				desiredWish.buyer = userId;
 				if (drawId) {
 					desiredWish.forDraw = drawId;
+					await notificationGenerator({
+						type: 'reservation',
+						params: {
+							reserved: true,
+							username: 'Święty Mikołaj',
+							giftName: desiredWish.title,
+						},
+						receiver: desiredWish.creator,
+					});
+				} else {
+					await notificationGenerator({
+						type: 'reservation',
+						params: {
+							reserved: true,
+							username: userReseving.username,
+							giftName: desiredWish.title,
+						},
+						receiver: desiredWish.creator,
+					});
 				}
 			} else {
 				if (desiredWish.buyer.toString() !== userId.toString()) {
@@ -152,6 +176,25 @@ module.exports = {
 				desiredWish.buyer = undefined;
 				if (drawId) {
 					desiredWish.forDraw = undefined;
+					await notificationGenerator({
+						type: 'reservation',
+						params: {
+							reserved: false,
+							username: 'Święty Mikołaj',
+							giftName: desiredWish.title,
+						},
+						receiver: desiredWish.creator,
+					});
+				} else {
+					await notificationGenerator({
+						type: 'reservation',
+						params: {
+							reserved: false,
+							username: userReseving.username,
+							giftName: desiredWish.title,
+						},
+						receiver: desiredWish.creator,
+					});
 				}
 			}
 			await desiredWish.save();

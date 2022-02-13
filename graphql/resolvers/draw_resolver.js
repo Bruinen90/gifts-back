@@ -1,5 +1,7 @@
 const RunDraw = require('../../scripts/RunDraw');
-// const ENV = require('../../env/env');
+
+// Notification generator
+const notificationGenerator = require('./notification_generator');
 
 // Send grid config
 const sgMail = require('@sendgrid/mail');
@@ -47,6 +49,15 @@ module.exports = {
 				status: 'pending',
 			});
 			const savedDraw = await draw.save();
+			for (participant of savedDraw.participants) {
+				await notificationGenerator({
+					type: 'newDraw',
+					params: {
+						drawName: savedDraw.title,
+					},
+					receiver: participant,
+				});
+			}
 			return savedDraw;
 		} catch (error) {
 			console.log(error);
@@ -174,12 +185,21 @@ module.exports = {
 					logoLinkTarget: domain,
 					header: 'Wyniki losowania w serwisie Bez-niespodzianek',
 					message: `Losowaie <b>${drawTitle}</b> dobiegło końca, wylosowałeś użytkownika: `,
-					username: username,
+					username: resultUsername,
 					unsubscribeLink: `${domain}/wypisz-sie?email=${resultUsername}?token=${resultToken}`,
 				},
 			});
 
 			for (const email of emailsArray) {
+				// Notification
+				await notificationGenerator({
+					type: 'drawResults',
+					params: {
+						drawName: draw.title,
+						drawResultUsername: email.resultUsername,
+					},
+					receiver: participant,
+				});
 				if (!email.unsubscribed) {
 					await sgMail.send(
 						generateMailOptions(

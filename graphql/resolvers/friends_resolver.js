@@ -2,6 +2,9 @@
 const Invitation = require('../../models/Invitation');
 const User = require('../../models/User');
 
+// Notification generator
+const notificationGenerator = require('./notification_generator');
+
 // Errors
 const throwAuthError = errorMessage => {
 	const error = new Error(errorMessage || 'Not authenticated');
@@ -19,31 +22,43 @@ const throwServerError = errorMessage => {
 
 module.exports = {
 	sendInvitation: async ({ receiverId }, req) => {
-		if (!req.userId) {
-			throwAuthError();
+		try {
+			if (!req.userId) {
+				throwAuthError();
+			}
+			const existingInvitation = await Invitation.findOne({
+				sender: req.userId,
+				receiver: receiverId,
+			});
+			if (existingInvitation) {
+				const error = new Error(
+					'You already invited that user, please be patient and wait for response'
+				);
+				error.code = 401;
+				throw error;
+			}
+			const newInvitation = await new Invitation({
+				sender: req.userId,
+				receiver: receiverId,
+			});
+			await newInvitation.save();
+			const sender = await User.findById(req.userId);
+			await notificationGenerator({
+				type: 'invitation',
+				params: {
+					username: sender.username,
+				},
+				receiver: receiverId,
+			});
+			if (!newInvitation) {
+				throwServerError(
+					'Error during invitation creation, please try again later'
+				);
+			}
+			return { _id: newInvitation._id };
+		} catch (err) {
+			console.log(err);
 		}
-		const existingInvitation = await Invitation.findOne({
-			sender: req.userId,
-			receiver: receiverId,
-		});
-		if (existingInvitation) {
-			const error = new Error(
-				'You already invited that user, please be patient and wait for response'
-			);
-			error.code = 401;
-			throw error;
-		}
-		const newInvitation = await new Invitation({
-			sender: req.userId,
-			receiver: receiverId,
-		});
-		await newInvitation.save();
-		if (!newInvitation) {
-			throwServerError(
-				'Error during invitation creation, please try again later'
-			);
-		}
-		return { _id: newInvitation._id };
 	},
 
 	getUserInvitations: async (_, req) => {
@@ -105,6 +120,13 @@ module.exports = {
 				await sender.save();
 				receiver.friends.push(respondedInvitation.sender);
 				await receiver.save();
+				await notificationGenerator({
+					type: 'invitationAccept',
+					params: {
+						username: receiver.username,
+					},
+					receiver: respondedInvitation.sender,
+				});
 				await Invitation.deleteOne({
 					_id: invitationId,
 					receiver: req.userId,
@@ -128,7 +150,7 @@ module.exports = {
 		return user.friends;
 	},
 
-	cancelFriendship: async ({friendId}, req) => {
+	cancelFriendship: async ({ friendId }, req) => {
 		if (!req.userId) {
 			throwAuthError('Loggin and try again');
 		}
