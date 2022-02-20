@@ -6,6 +6,7 @@ const NotificationSchema = new Schema(
 		receiver: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 		type: { type: String, requried: true },
 		content: { type: String, required: true },
+		expireAt: { type: Date, default: Date.now, expires: '43200m' },
 	},
 	{ timestamps: true }
 );
