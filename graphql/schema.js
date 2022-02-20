@@ -97,6 +97,12 @@ module.exports = buildSchema(`
         itemPrice: String
     }
 
+    type Notification {
+        type: String!
+        content: String!
+        createdAt: String!
+    }
+
     input SignUpInputData {
         username: String!
         email: String!
@@ -195,6 +201,7 @@ module.exports = buildSchema(`
         getShoppingList: [WishPopulated]
         verifyToken(token: String!): User!
         getAllegroItemData(itemId: String!): ItemData
+        getUserNotifications: [Notification]
     }
 
     schema {
