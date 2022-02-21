@@ -189,6 +189,7 @@ module.exports = buildSchema(`
         changeEmail(changeEmailInput: ChangeEmailInput!): SuccessResult
         unsubscribe(unsubscribeInput: UnsubscribeInput): SuccessResult
         setWishDone(input: WishDoneInput): SuccessResult
+        setNotificationAsRead(notificationId: ID!): SuccessResult
     }
 
     type RootQuery {
