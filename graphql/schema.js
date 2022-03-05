@@ -101,6 +101,7 @@ module.exports = buildSchema(`
         type: String!
         content: String!
         createdAt: String!
+        read: Boolean!
     }
 
     input SignUpInputData {
@@ -190,6 +191,7 @@ module.exports = buildSchema(`
         unsubscribe(unsubscribeInput: UnsubscribeInput): SuccessResult
         setWishDone(input: WishDoneInput): SuccessResult
         setNotificationAsRead(notificationId: ID!): SuccessResult
+        setAllUsetNotificationsAsRead: SuccessResult
     }
 
     type RootQuery {

@@ -34,6 +34,7 @@ module.exports = {
 				type: notification.type,
 				content: notification.content,
 				createdAt: notification.createdAt,
+				read: notification.read,
 			}));
 		} catch (err) {
 			console.log(err);
@@ -62,9 +63,19 @@ module.exports = {
 	},
 	setAllUsetNotificationsAsRead: async (_, req) => {
 		const { userId } = req;
-		if (!userId) {
-			console.log('No req token provided!');
-			throwAuthError();
+		try {
+			if (!userId) {
+				console.log('No req token provided!');
+				throwAuthError();
+			}
+			const notifications = await Notification.find({ receiver: userId });
+			for (let notification of notifications) {
+				notification.read = true;
+				await notification.save();
+			}
+			return { success: true };
+		} catch (err) {
+			console.log(err);
 		}
 	},
 };
