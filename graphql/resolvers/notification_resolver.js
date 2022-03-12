@@ -31,6 +31,7 @@ module.exports = {
 				return [];
 			}
 			return userNotifications.map(notification => ({
+				_id: notification._id,
 				type: notification.type,
 				content: notification.content,
 				createdAt: notification.createdAt,
@@ -50,7 +51,7 @@ module.exports = {
 			const readNotification = await Notification.findById(
 				notificationId
 			);
-			if (readNotification.receiver !== userId) {
+			if (readNotification.receiver.toString() !== userId.toString()) {
 				throwAuthError();
 			}
 			readNotification.read = true;

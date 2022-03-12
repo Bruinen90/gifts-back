@@ -98,6 +98,7 @@ module.exports = buildSchema(`
     }
 
     type Notification {
+        _id: ID!
         type: String!
         content: String!
         createdAt: String!
