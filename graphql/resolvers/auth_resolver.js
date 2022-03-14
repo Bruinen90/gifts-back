@@ -105,16 +105,15 @@ module.exports = {
 		try {
 			let user = await User.findOne({ email: userInput.usernameOrEmail });
 			if (!user) {
-				console.log('No user found');
 				user = await User.findOne({
 					username: userInput.usernameOrEmail,
 				});
 				if (!user) {
-					const error = new Error(
-						'User not found, please, check login'
-					);
-					error.code = 401;
-					throw error;
+					return {
+						__typename: 'SuccessResult',
+						success: false,
+						message: 'User not found, please, check login',
+					};
 				}
 			}
 			const isEqual = await bcrypt.compare(
@@ -122,9 +121,11 @@ module.exports = {
 				user.password
 			);
 			if (!isEqual) {
-				const error = new Error('Invalid password');
-				error.code = 401;
-				throw error;
+				return {
+					__typename: 'SuccessResult',
+					success: false,
+					message: 'Invalid password',
+				};
 			}
 			const token = jwt.sign(
 				{
@@ -135,6 +136,7 @@ module.exports = {
 				process.env.JWT_SECRET
 			);
 			return {
+				__typename: 'AuthData',
 				token: token,
 				userId: user._id.toString(),
 				username: user.username,

@@ -171,6 +171,8 @@ module.exports = buildSchema(`
         done: Boolean!
     }
 
+    union LoginResult = AuthData | SuccessResult
+
     type RootMutation {
         createUser(userInput: SignUpInputData): User!
         createDraw(drawInput: DrawInput): Draw!
@@ -196,7 +198,7 @@ module.exports = buildSchema(`
     }
 
     type RootQuery {
-        login(userInput: SignInInputData): AuthData!
+        login(userInput: SignInInputData): LoginResult!
         loginWithGoogle(googleIdToken: GoogleIdToken): AuthData
         userDraws: DrawsList!
         findUser(searchPhrase: String): [User]
