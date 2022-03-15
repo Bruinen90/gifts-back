@@ -1,6 +1,7 @@
 // Models
 const Invitation = require('../../models/Invitation');
 const User = require('../../models/User');
+const Notification = require('../../models/Notification');
 
 // Notification generator
 const notificationGenerator = require('./notification_generator');
@@ -83,9 +84,16 @@ module.exports = {
 		}
 		try {
 			if (decision === 'cancel') {
-				const respondedInvitation = await Invitation.deleteOne({
+				const respondedInvitation = await Invitation.findOneAndDelete({
 					_id: invitationId,
 					sender: req.userId,
+				});
+				// Delete notification related to that invitation
+				const senderUser = await User.findById(req.userId);
+				await Notification.deleteOne({
+					receiver: respondedInvitation.receiver,
+					type: 'invitation',
+					content: { $regex: senderUser.username },
 				});
 				if (!respondedInvitation) {
 					throwAuthError(
