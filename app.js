@@ -9,7 +9,9 @@ const graphqlHttp = require('express-graphql');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/root_resolver');
 
-// const ENV = require('./env/env');
+const User = require('./models/User');
+const jws = require('jsonwebtoken');
+
 require('dotenv').config();
 
 const app = express();
@@ -51,12 +53,33 @@ const spinnUp = async () => {
 				useUnifiedTopology: true,
 			}
 		);
-		app.listen(process.env.PORT || 8080);
+		const server = app.listen(process.env.PORT || 8080);
+		const io = require('./socket');
+		io.init(server).on('connection', async socket => {
+			if (!socket.handshake.auth.token) {
+				throw new Error('Socket client not authorized');
+			} else {
+				const authToken = socket.handshake.auth.token;
+				try {
+					const decodedToken = jws.verify(
+						authToken,
+						process.env.JWT_SECRET
+					);
+					const socketUser = await User.findById(decodedToken.userId);
+					if (socketUser.email !== decodedToken.email) {
+						throw new Error('No user found, unauthorized');
+					}
+					socket.userId = decodedToken.userId;
+					// Create individual room for connected user
+					socket.join(decodedToken.userId);
+				} catch (error) {
+					console.log(error);
+				}
+			}
+		});
 	} catch (error) {
 		console.log(error);
 	}
 };
 
 spinnUp();
-
-console.log('IM RUNNING');

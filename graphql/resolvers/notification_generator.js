@@ -1,4 +1,5 @@
 const Notification = require('../../models/Notification');
+const io = require('../../socket');
 
 const notificationGenerator = async ({ type, params, receiver }) => {
 	let content = '';
@@ -25,6 +26,13 @@ const notificationGenerator = async ({ type, params, receiver }) => {
 	}
 	const notification = new Notification({ receiver, type, content });
 	await notification.save();
+	// SocketIO
+	io.getIO()
+		.to(receiver)
+		.emit('notification', {
+			action: 'new',
+			notification,
+		});
 };
 
 module.exports = notificationGenerator;
