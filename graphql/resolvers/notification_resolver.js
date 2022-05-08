@@ -35,6 +35,7 @@ module.exports = {
 				type: notification.type,
 				content: notification.content,
 				createdAt: notification.createdAt,
+				connectedRecordId: notification.connectedRecordId,
 				read: notification.read,
 			}));
 		} catch (err) {

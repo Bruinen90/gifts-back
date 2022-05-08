@@ -7,6 +7,7 @@ const NotificationSchema = new Schema(
 		type: { type: String, requried: true },
 		content: { type: String, required: true },
 		read: { type: Boolean, required: true, default: false },
+		connectedRecordId: { type: Schema.Types.ObjectId, required: false },
 		expireAt: { type: Date, default: Date.now, expires: '43200m' },
 	},
 	{ timestamps: true }

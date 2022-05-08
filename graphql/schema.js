@@ -103,6 +103,7 @@ module.exports = buildSchema(`
         content: String!
         createdAt: String!
         read: Boolean!
+        connectedRecordId: String
     }
 
     input SignUpInputData {

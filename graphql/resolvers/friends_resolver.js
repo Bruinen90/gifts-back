@@ -50,6 +50,7 @@ module.exports = {
 					username: sender.username,
 				},
 				receiver: receiverId,
+				connectedRecordId: newInvitation._id,
 			});
 			if (!newInvitation) {
 				throwServerError(

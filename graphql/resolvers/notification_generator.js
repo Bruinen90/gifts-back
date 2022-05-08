@@ -1,7 +1,12 @@
 const Notification = require('../../models/Notification');
 const io = require('../../socket');
 
-const notificationGenerator = async ({ type, params, receiver }) => {
+const notificationGenerator = async ({
+	type,
+	params,
+	receiver,
+	connectedRecordId,
+}) => {
 	let content = '';
 	switch (type) {
 		case 'reservation':
@@ -24,7 +29,12 @@ const notificationGenerator = async ({ type, params, receiver }) => {
 		default:
 			content = 'Błąd podczas generowania powiadomienia';
 	}
-	const notification = new Notification({ receiver, type, content });
+	const notification = new Notification({
+		receiver,
+		type,
+		content,
+		connectedRecordId,
+	});
 	await notification.save();
 	// SocketIO
 	io.getIO()
