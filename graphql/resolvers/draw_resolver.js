@@ -159,6 +159,7 @@ module.exports = {
 							participant._id.toString()
 					).getter;
 					return {
+						userId: participant.id,
 						username: participant.username,
 						email: participant.email,
 						emailToken: participant.token,
@@ -198,7 +199,7 @@ module.exports = {
 						drawName: draw.title,
 						drawResultUsername: email.resultUsername,
 					},
-					receiver: participant,
+					receiver: email.userId,
 				});
 				if (!email.unsubscribed) {
 					await sgMail.send(
